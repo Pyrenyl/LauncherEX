@@ -47,6 +47,7 @@ import com.android.launcher3.search.SearchCallback;
 import com.android.launcher3.views.ActivityContext;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 /**
  * Layout to contain the All-apps search UI.
@@ -98,6 +99,14 @@ public class AppsSearchContainerLayout extends ExtendedEditText
 
             @Override
             public void afterTextChanged(Editable s) {
+            }
+        });
+
+        addOnFocusChangeListener((v, hasFocus) -> {
+            if (hasFocus && !mIsSearchSessionActive) {
+                mIsSearchSessionActive = true;
+                // non-null list to trigger animateToSearchState
+                mAppsView.setSearchResults(Collections.emptyList());
             }
         });
 
