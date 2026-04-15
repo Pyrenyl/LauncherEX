@@ -79,9 +79,12 @@ class SettingsChangeLoggerTest {
     fun loggingPrefs_correctDefaultValue() {
         val systemUnderTest = SettingsChangeLogger.INSTANCE.get(context)
 
+        // GrapheneOS: AOSP launcher_preferences.xml only declares pref_icon_badging,
+        // pref_add_icon_to_home, and pref_allowRotation. Upstream originally also asserted
+        // OVERVIEW_SUGGESTED_ACTIONS ("pref_overview_action_suggestions") and
+        // KEY_ENABLE_MINUS_ONE ("pref_enable_minus_one"), which only exist in the
+        // Pixel Launcher (NexusLauncher) build's launcher_preferences.xml, not in AOSP.
         assertThat(systemUnderTest.loggingPrefs[ADD_ICON_PREFERENCE_KEY]!!.defaultValue).isTrue()
-        assertThat(systemUnderTest.loggingPrefs[OVERVIEW_SUGGESTED_ACTIONS]!!.defaultValue).isTrue()
-        assertThat(systemUnderTest.loggingPrefs[KEY_ENABLE_MINUS_ONE]!!.defaultValue).isTrue()
     }
 
     @Test
@@ -100,23 +103,19 @@ class SettingsChangeLoggerTest {
     }
 
     private fun verifyDefaultEvent(capturedEvents: MutableList<StatsLogManager.EventEnum>) {
+        // GrapheneOS: LAUNCHER_ALL_APPS_SUGGESTIONS_ENABLED (619) and
+        // LAUNCHER_GOOGLE_APP_SWIPE_LEFT_ENABLED (617) are only emitted by the
+        // Pixel Launcher (NexusLauncher) build, which declares the
+        // pref_overview_action_suggestions and pref_enable_minus_one keys in
+        // its own launcher_preferences.xml. AOSP Launcher3's
+        // launcher_preferences.xml does not declare those prefs.
         assertThat(capturedEvents.any { it.id == LAUNCHER_NOTIFICATION_DOT_ENABLED.id }).isTrue()
         assertThat(capturedEvents.any { it.id == LAUNCHER_NAVIGATION_MODE_GESTURE_BUTTON.id })
             .isTrue()
         assertThat(capturedEvents.any { it.id == LAUNCHER_THEMED_ICON_DISABLED.id }).isTrue()
         assertThat(capturedEvents.any { it.id == LAUNCHER_ADD_NEW_APPS_TO_HOME_SCREEN_ENABLED.id })
             .isTrue()
-        assertThat(capturedEvents.any { it.id == LAUNCHER_ALL_APPS_SUGGESTIONS_ENABLED.id })
-            .isTrue()
         assertThat(capturedEvents.any { it.id == LAUNCHER_HOME_SCREEN_SUGGESTIONS_ENABLED.id })
             .isTrue()
-        assertThat(capturedEvents.any { it.id == LAUNCHER_GOOGLE_APP_SWIPE_LEFT_ENABLED }).isTrue()
-    }
-
-    companion object {
-        private const val KEY_ENABLE_MINUS_ONE = "pref_enable_minus_one"
-        private const val OVERVIEW_SUGGESTED_ACTIONS = "pref_overview_action_suggestions"
-
-        private const val LAUNCHER_GOOGLE_APP_SWIPE_LEFT_ENABLED = 617
     }
 }
