@@ -57,6 +57,7 @@ import com.android.quickstep.TopTaskTracker;
 import com.android.quickstep.views.RecentsView;
 import com.android.quickstep.views.RecentsViewContainer;
 
+import org.junit.AssumptionViolatedException;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -219,6 +220,8 @@ public class ContextualSearchInvokerTest {
             verify(mMockContextualSearchManager).startContextualSearch(
                     eq(CONTEXTUAL_SEARCH_ENTRY_POINT), any());
             verifyNoMoreInteractions(mMockStatsLogManager);
+        } catch (AssumptionViolatedException e) {
+            throw e;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -234,6 +237,8 @@ public class ContextualSearchInvokerTest {
             verify(mMockContextualSearchManager).startContextualSearch(
                     eq(CONTEXTUAL_SEARCH_ENTRY_POINT), any());
             verifyNoMoreInteractions(mMockStatsLogManager);
+        } catch (AssumptionViolatedException e) {
+            throw e;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -253,6 +258,8 @@ public class ContextualSearchInvokerTest {
             verify(mMockContextualSearchManager).startContextualSearch(
                     eq(CONTEXTUAL_SEARCH_ENTRY_POINT), any());
             verifyNoMoreInteractions(mMockStatsLogManager);
+        } catch (AssumptionViolatedException e) {
+            throw e;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -273,6 +280,8 @@ public class ContextualSearchInvokerTest {
             verify(mMockContextualSearchManager).startContextualSearch(
                     eq(CONTEXTUAL_SEARCH_ENTRY_POINT), any());
             verifyNoMoreInteractions(mMockStatsLogManager);
+        } catch (AssumptionViolatedException e) {
+            throw e;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

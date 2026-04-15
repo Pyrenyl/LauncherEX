@@ -38,6 +38,7 @@ import com.android.quickstep.util.ContextualSearchInvoker;
 import com.android.quickstep.util.ContextualSearchStateManager;
 import com.android.quickstep.util.TestExtensions;
 
+import org.junit.AssumptionViolatedException;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -80,6 +81,8 @@ public class NavHandleLongPressHandlerTest {
             mLongPressHandler.startNavBarAnimation(mNavHandle);
             verify(mNavHandle, never())
                     .animateNavBarLongPress(anyBoolean(), anyBoolean(), anyLong());
+        } catch (AssumptionViolatedException e) {
+            throw e;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -90,6 +93,8 @@ public class NavHandleLongPressHandlerTest {
         try (AutoCloseable flag = overrideAnimateLPNHFlag(true)) {
             mLongPressHandler.startNavBarAnimation(mNavHandle);
             verify(mNavHandle).animateNavBarLongPress(anyBoolean(), anyBoolean(), anyLong());
+        } catch (AssumptionViolatedException e) {
+            throw e;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
