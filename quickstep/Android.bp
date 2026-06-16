@@ -54,9 +54,6 @@ filegroup {
 
 android_test {
     name: "Launcher3QuickStepTests",
-    defaults: [
-        "launcher_compose_tests_defaults",
-    ],
     srcs: [
         ":launcher3-quickstep-tests-src",
         ":launcher-tests-src",
