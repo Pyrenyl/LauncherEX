@@ -19,18 +19,8 @@ package {
 
 min_launcher3_sdk_version = "31"
 
-// Targets that don't inherit framework aconfig libs (i.e., those that don't set
-// `platform_apis: true`) must manually link them.
-java_defaults {
-    name: "launcher-non-platform-apis-defaults",
-    static_libs: [
-        "android.os.flags-aconfig-java",
-        "android.multiuser.flags-aconfig-java",
-        "android.appwidget.flags-aconfig-java",
-        "com.android.window.flags.window-aconfig-java",
-        "android.security.flags-aconfig-java",
-    ],
-}
+// LauncherEX: a third-party APK cannot call framework aconfig classes hidden in the boot
+// classpath, so Launcher3 does not link the non-platform flag defaults used by system builds.
 
 // Common source files used to build launcher (java and kotlin)
 // All sources are split so they can be reused in many other libraries/apps in other folders
@@ -42,6 +32,9 @@ filegroup {
         "src/**/*.java",
         "src/**/*.kt",
     ],
+    // LauncherEX: App Lock is a system-only GrapheneOS API and cannot be used without platform
+    // identity.
+    exclude_srcs: ["src/com/android/launcher3/popup/AppLockShortcut.kt"],
 }
 
 filegroup {
@@ -316,7 +309,8 @@ android_library {
         "launcher-dagger-qualifiers",
         "launcher-executor-qualifiers",
         "launcher-executors-module",
-        "mediaprovider_exported_aconfig_flag_lib",
+        // LauncherEX: MediaProvider aconfig is hidden from ordinary APKs; the caller uses the
+        // public API directly instead.
         "widget_picker_component",
         "workspace-functions",
         // Compose dependencies
@@ -336,7 +330,7 @@ android_library {
     flags_packages: [
         "com_android_launcher3_flags",
         "android.security.flags-aconfig",
-        "mediaprovider_flags",
+        // LauncherEX: mediaprovider_flags is intentionally omitted because it is not public SDK.
     ],
 }
 
@@ -345,10 +339,8 @@ android_library {
 //
 android_app {
     name: "Launcher3",
-    defaults: [
-        "launcher-non-platform-apis-defaults",
-    ],
-
+    // LauncherEX: framework aconfig defaults are intentionally omitted; they compile but are
+    // blocked by hidden API enforcement when this APK is installed as an ordinary application.
     static_libs: [
         "Launcher3ResLib",
         // Compose dep
@@ -362,8 +354,8 @@ android_app {
 
     optimize: {
         proguard_flags_files: [":launcher-proguard-rules"],
-        // Proguard is disable for testing. Derivarive prjects to keep proguard enabled
-        enabled: false,
+        // LauncherEX: remove unreachable system-only branches and their hidden API references.
+        enabled: true,
     },
 
     sdk_version: "current",
@@ -392,6 +384,13 @@ android_app {
     kotlincflags: [
         "-Xjvm-default=all",
     ],
+}
+
+override_android_app {
+    // LauncherEX: a distinct install package lets this build coexist with system Launcher3.
+    name: "GexLauncher3",
+    base: "Launcher3",
+    package_name: "com.android.launcher3.ex",
 }
 
 // Library with all the dependencies for building quickstep

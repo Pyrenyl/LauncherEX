@@ -25,7 +25,6 @@ import com.android.launcher3.Flags.showFilesOnHomeScreen
 import com.android.launcher3.LauncherSettings.Favorites.ITEM_TYPE_FILE_SYSTEM_FILE
 import com.android.launcher3.LauncherSettings.Favorites.ITEM_TYPE_FILE_SYSTEM_FOLDER
 import com.android.launcher3.model.data.ItemInfo
-import com.android.providers.media.flags.Flags.enableTrashAndRestoreByFilePathApi
 
 /** Other utility methods related to managing files on the home screen. */
 class HomeScreenFilesUtils {
@@ -42,8 +41,9 @@ class HomeScreenFilesUtils {
         }
 
         /** Returns `true` if the "Move to trash" feature is enabled. */
-        fun isTrashingEnabled() =
-            enableHomeScreenFilesTrashing() && enableTrashAndRestoreByFilePathApi()
+        // LauncherEX: MediaProvider's aconfig accessor is hidden; the public file API is available
+        // on the target OS, so only Launcher3's own feature flag is needed.
+        fun isTrashingEnabled() = enableHomeScreenFilesTrashing()
 
         /** Returns the appropriate item type for the given [homeScreenFile]. */
         fun buildItemType(homeScreenFile: HomeScreenFile) =

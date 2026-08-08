@@ -121,7 +121,12 @@ constructor(
         lifecycle.addCloseable(dumpManager.register(this))
     }
 
-    fun newModelCallbacks() = ModelLauncherCallbacks(this::enqueueModelUpdateTask)
+    fun newModelCallbacks() =
+        ModelLauncherCallbacks(this::enqueueModelUpdateTask) {
+            // LauncherEX: public LauncherApps config callbacks replace the hidden Secure setting
+            // observer previously used for private-space visibility.
+            rebindCallbacks("private-space-config-changed")
+        }
 
     fun getWriter(
         verifyChanges: Boolean,

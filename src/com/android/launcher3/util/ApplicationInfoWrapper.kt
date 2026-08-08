@@ -113,11 +113,9 @@ class ApplicationInfoWrapper private constructor(provider: () -> ApplicationInfo
 
     fun getInfo(): ApplicationInfo? = appInfo
 
-    /** Returns whether the target app supports App Lock for a given user */
-    fun isAppLockSupported() =
-        android.security.Flags.appLockApis() && appInfo?.isAppLockSupported ?: false
+    /** LauncherEX: App Lock requires system APIs unavailable to third-party launchers. */
+    fun isAppLockSupported() = false
 
-    /** Returns whether the target app has App Lock enabled for a given user */
-    fun isAppLockEnabled() =
-        android.security.Flags.appLockApis() && appInfo?.isAppLockEnabled ?: false
+    /** LauncherEX: App Lock requires system APIs unavailable to third-party launchers. */
+    fun isAppLockEnabled() = false
 }

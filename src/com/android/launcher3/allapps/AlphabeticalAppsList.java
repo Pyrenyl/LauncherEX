@@ -15,8 +15,6 @@
  */
 package com.android.launcher3.allapps;
 
-import static android.multiuser.Flags.enableMovingContentIntoPrivateSpace;
-
 import static com.android.launcher3.LauncherSettings.Favorites.CONTAINER_PRIVATESPACE;
 import static com.android.launcher3.allapps.BaseAllAppsAdapter.VIEW_TYPE_BOTTOM_VIEW_TO_SCROLL_TO;
 import static com.android.launcher3.allapps.BaseAllAppsAdapter.VIEW_TYPE_MASK_PRIVATE_SPACE_HEADER;
@@ -388,12 +386,8 @@ public class AlphabeticalAppsList implements AllAppsStore.OnUpdateListener {
     }
 
     private int addPrivateSpaceApps(int position) {
-        // Add Install Apps Button first.
-        if (!enableMovingContentIntoPrivateSpace()) {
-            mPrivateProviderManager.addPrivateSpaceInstallAppButton(mAdapterItems);
-            position++;
-        }
-
+        // LauncherEX: use the enabled moving-content behavior without calling the hidden
+        // android.multiuser flag API.
         // Split of private space apps into user-installed and system apps.
         Map<Boolean, List<AppInfo>> split = mPrivateApps.stream()
                 .collect(Collectors.partitioningBy(mPrivateProviderManager
@@ -425,31 +419,30 @@ public class AlphabeticalAppsList implements AllAppsStore.OnUpdateListener {
         // Add system apps.
         position = addAppsWithSections(split.get(false), position);
 
-        if (enableMovingContentIntoPrivateSpace()) {
-            // Look for the private space app via package and move it after header.
-            int headerIndex = -1;
-            int privateSpaceAppIndex = -1;
-            for (int i = 0; i < mAdapterItems.size(); i++) {
-                BaseAllAppsAdapter.AdapterItem currentItem = mAdapterItems.get(i);
-                if (currentItem.viewType == VIEW_TYPE_MASK_PRIVATE_SPACE_HEADER) {
-                    headerIndex = i;
-                }
-                if (currentItem.itemInfo != null && isPrivateSpaceApp(currentItem.itemInfo)) {
-                    // TODO: Somehow do the theming bitmap change in the model layer.
-                    currentItem.itemInfo.bitmap = mPrivateProviderManager.preparePSBitmapInfo();
-                    currentItem.itemInfo.title = mPrivateProviderManager.getPSAppTitleOverride();
-                    currentItem.itemInfo.contentDescription =
-                            mPrivateProviderManager.getPsAppContentDesc();
-                    currentItem.itemInfo.container = CONTAINER_PRIVATESPACE;
-                    privateSpaceAppIndex = i;
-                }
+        // LauncherEX: this was the enabled branch of enableMovingContentIntoPrivateSpace(); run it
+        // unconditionally because third-party APKs cannot query that hidden framework flag.
+        // Look for the private space app via package and move it after header.
+        int headerIndex = -1;
+        int privateSpaceAppIndex = -1;
+        for (int i = 0; i < mAdapterItems.size(); i++) {
+            BaseAllAppsAdapter.AdapterItem currentItem = mAdapterItems.get(i);
+            if (currentItem.viewType == VIEW_TYPE_MASK_PRIVATE_SPACE_HEADER) {
+                headerIndex = i;
             }
-            if (headerIndex != -1 && privateSpaceAppIndex != -1) {
-                BaseAllAppsAdapter.AdapterItem movedItem =
-                        mAdapterItems.remove(privateSpaceAppIndex);
-                // Move the icon after the header.
-                mAdapterItems.add(headerIndex + 1, movedItem);
+            if (currentItem.itemInfo != null && isPrivateSpaceApp(currentItem.itemInfo)) {
+                // TODO: Somehow do the theming bitmap change in the model layer.
+                currentItem.itemInfo.bitmap = mPrivateProviderManager.preparePSBitmapInfo();
+                currentItem.itemInfo.title = mPrivateProviderManager.getPSAppTitleOverride();
+                currentItem.itemInfo.contentDescription =
+                        mPrivateProviderManager.getPsAppContentDesc();
+                currentItem.itemInfo.container = CONTAINER_PRIVATESPACE;
+                privateSpaceAppIndex = i;
             }
+        }
+        if (headerIndex != -1 && privateSpaceAppIndex != -1) {
+            BaseAllAppsAdapter.AdapterItem movedItem = mAdapterItems.remove(privateSpaceAppIndex);
+            // Move the icon after the header.
+            mAdapterItems.add(headerIndex + 1, movedItem);
         }
         return position;
     }

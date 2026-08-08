@@ -167,7 +167,7 @@ public class WidgetManagerHelper {
     @RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)
     public RemoteViews loadGeneratedPreview(@NonNull AppWidgetProviderInfo info,
             int widgetCategory) {
-        if (!android.appwidget.flags.Flags.generatedPreviews()) return null;
+        // LauncherEX: the API-level guard is public and sufficient; its aconfig accessor is hidden.
         return mAppWidgetManager.getWidgetPreview(info.provider, info.getProfile(), widgetCategory);
     }
 

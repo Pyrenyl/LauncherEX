@@ -58,7 +58,6 @@ import com.android.launcher3.util.Executors.UI_HELPER_EXECUTOR
 import com.android.launcher3.util.PackageUserKey
 import com.android.launcher3.util.SettingsCache
 import com.android.launcher3.util.SettingsCache.NOTIFICATION_BADGING_URI
-import com.android.launcher3.util.SettingsCache.PRIVATE_SPACE_HIDE_WHEN_LOCKED_URI
 import com.android.launcher3.util.SimpleBroadcastReceiver
 import com.android.launcher3.util.SimpleBroadcastReceiver.Companion.actionsFilter
 import com.android.launcher3.widget.ProvidersUpdateDispatcher
@@ -142,14 +141,8 @@ constructor(
             userCache.userChanges.forEach(MODEL_EXECUTOR) { handleUserEvent(model, it) }
         )
 
-        // Private space settings changes
-        lifeCycle.addCloseable(
-            settingsCache.getListenableRef(PRIVATE_SPACE_HIDE_WHEN_LOCKED_URI).forEach(
-                MAIN_EXECUTOR
-            ) {
-                model.rebindCallbacks("private-space-state-changed")
-            }
-        )
+        // LauncherEX: private-space visibility changes arrive through LauncherApps.Callback;
+        // observing the hidden Secure setting here would throw SecurityException.
 
         // Notification dots changes
         lifeCycle.addCloseable(

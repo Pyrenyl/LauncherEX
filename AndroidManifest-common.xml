@@ -45,16 +45,18 @@
     <uses-permission android:name="android.permission.ROTATE_SURFACE_FLINGER" />
     <uses-permission android:name="android.permission.WAKEUP_SURFACE_FLINGER" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
-    <uses-permission android:name="android.permission.LOCK_APPS"
-                     android:featureFlag="android.security.app_lock_apis" />
+    <!-- LauncherEX: default launchers need this role-granted permission to enumerate the private
+         profile; LOCK_APPS is omitted because it is system-only. -->
+    <uses-permission android:name="android.permission.ACCESS_HIDDEN_PROFILES" />
     <uses-permission android:name="com.android.systemui.permission.LAUNCH_ACCESSIBILITY_SHORTCUT_CHOOSER_DIALOG" />
 
+    <!-- LauncherEX: package-scoped permissions must not collide with the system Launcher3. -->
     <permission
-        android:name="${applicationId}.permission.GRID_CONTROL"
+        android:name="com.android.launcher3.ex.permission.GRID_CONTROL"
         android:knownCerts="@array/grid_control_known_signers"
         android:protectionLevel="signature|knownSigner"/>
 
-    <uses-permission android:name="${applicationId}.permission.GRID_CONTROL" />
+    <uses-permission android:name="com.android.launcher3.ex.permission.GRID_CONTROL" />
 
     <application
         android:backupAgent="com.android.launcher3.LauncherBackupAgent"
@@ -115,9 +117,10 @@
         should be changed to what is defined above. The authorities should also be changed to
         represent the package name.
         -->
+        <!-- LauncherEX: use a unique authority so both launcher packages can be installed. -->
         <provider
             android:name="com.android.launcher3.LauncherProvider"
-            android:authorities="${applicationId}.settings"
+            android:authorities="com.android.launcher3.ex.settings"
             android:exported="true"
             android:writePermission="android.permission.ACCESS_LAUNCHER_DATA"
             android:readPermission="android.permission.ACCESS_LAUNCHER_DATA" />
@@ -128,9 +131,10 @@
              - android.permission.BIND_WALLPAPER
              - ${applicationId}.permission.GRID_CONTROL
          -->
+        <!-- LauncherEX: keep grid-control IPC inside the renamed package namespace. -->
         <provider
             android:name="com.android.launcher3.graphics.LauncherCustomizationProvider"
-            android:authorities="${applicationId}.grid_control"
+            android:authorities="com.android.launcher3.ex.grid_control"
             android:exported="true" />
 
         <!--
@@ -149,9 +153,10 @@
             </intent-filter>
         </activity>
 
+        <!-- LauncherEX: avoid claiming the system Launcher's test-provider authority. -->
         <provider
             android:name="com.android.launcher3.testing.TestInformationProvider"
-            android:authorities="${applicationId}.TestInfo"
+            android:authorities="com.android.launcher3.ex.TestInfo"
             android:readPermission="android.permission.WRITE_SECURE_SETTINGS"
             android:writePermission="android.permission.WRITE_SECURE_SETTINGS"
             android:exported="true"

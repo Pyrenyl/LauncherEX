@@ -35,8 +35,6 @@ import static com.android.launcher3.logging.StatsLogManager.LauncherEvent.LAUNCH
 import static com.android.launcher3.model.data.AppsListData.FLAG_PRIVATE_PROFILE_QUIET_MODE_ENABLED;
 import static com.android.launcher3.model.data.ItemInfoWithIcon.FLAG_NOT_PINNABLE;
 import static com.android.launcher3.util.Executors.UI_HELPER_EXECUTOR;
-import static com.android.launcher3.util.SettingsCache.PRIVATE_SPACE_HIDE_WHEN_LOCKED_URI;
-
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
@@ -44,6 +42,8 @@ import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.LauncherApps;
+import android.content.pm.LauncherUserInfo;
 import android.os.Trace;
 import android.os.UserHandle;
 import android.util.Log;
@@ -77,7 +77,6 @@ import com.android.launcher3.pm.UserCache;
 import com.android.launcher3.util.ApiWrapper;
 import com.android.launcher3.util.LooperExecutor;
 import com.android.launcher3.util.Preconditions;
-import com.android.launcher3.util.SettingsCache;
 import com.android.launcher3.views.ActivityContext;
 import com.android.launcher3.views.RecyclerViewFastScroller;
 
@@ -216,8 +215,21 @@ public class PrivateProfileManager extends UserProfileManager {
 
     /** Whether private profile should be hidden on Launcher. */
     public boolean isPrivateSpaceHidden() {
-        return getCurrentState() == STATE_DISABLED && SettingsCache.INSTANCE
-                .get(mAllApps.getContext()).getValue(PRIVATE_SPACE_HIDE_WHEN_LOCKED_URI);
+        if (getCurrentState() != STATE_DISABLED) {
+            return false;
+        }
+
+        UserHandle profileUser = getProfileUser();
+        if (profileUser == null) {
+            return false;
+        }
+
+        // LauncherEX: system_server reads the restricted Secure setting and exposes the result
+        // through this public launcher API; direct Settings.Secure access crashes ordinary APKs.
+        LauncherUserInfo userInfo = mAllApps.getContext().getSystemService(LauncherApps.class)
+                .getLauncherUserInfo(profileUser);
+        return userInfo != null && userInfo.getUserConfig().getBoolean(
+                LauncherUserInfo.PRIVATE_SPACE_ENTRYPOINT_HIDDEN);
     }
 
     BitmapInfo preparePSBitmapInfo() {

@@ -2799,10 +2799,9 @@ public class Launcher extends StatefulActivity<LauncherState>
                 return Stream.of(APP_INFO, WIDGETS, INSTALL);
             }
         }
-        return Stream.of(APP_INFO, WIDGETS, INSTALL
-                , com.android.launcher3.popup.SystemShortcut.STORAGE_SCOPES
-                , com.android.launcher3.popup.SystemShortcut.CONTACT_SCOPES
-        );
+        // LauncherEX: Storage/Contact Scopes shortcuts depend on GrapheneOS framework APIs hidden
+        // from third-party APKs, so expose only public package actions here.
+        return Stream.of(APP_INFO, WIDGETS, INSTALL);
     }
 
     /**

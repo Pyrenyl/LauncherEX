@@ -33,7 +33,6 @@ import android.util.AttributeSet;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup.MarginLayoutParams;
-import android.view.inputmethod.InputMethodManager;
 
 import com.android.launcher3.DeviceProfile;
 import com.android.launcher3.ExtendedEditText;
@@ -107,14 +106,17 @@ public class AppsSearchContainerLayout extends ExtendedEditText
                 getResources().getDimensionPixelSize(R.dimen.all_apps_search_bar_content_overlap);
     }
 
+    // LauncherEX: TextView.viewClicked() is hidden from public SDK stubs; performClick() preserves
+    // the same click-triggered search transition for a third-party build.
     @Override
-    protected void viewClicked(InputMethodManager imm) {
-        super.viewClicked(imm);
+    public boolean performClick() {
+        boolean handled = super.performClick();
         if (!mIsSearchSessionActive) {
             mIsSearchSessionActive = true;
             // non-null list to trigger animateToSearchState
             mAppsView.setSearchResults(Collections.emptyList());
         }
+        return handled;
     }
 
     @Override

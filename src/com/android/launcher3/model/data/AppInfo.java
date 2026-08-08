@@ -212,19 +212,9 @@ public class AppInfo extends ItemInfoWithIcon implements WorkspaceItemFactory {
             info.runtimeStatusFlags &= ~FLAG_NOT_PINNABLE;
         }
 
-        if (android.security.Flags.appLockApis()) {
-            if (appInfo.isAppLockSupported()) {
-                info.runtimeStatusFlags |= FLAG_APP_LOCK_SUPPORTED;
-            } else {
-                info.runtimeStatusFlags &= ~FLAG_APP_LOCK_SUPPORTED;
-            }
-
-            if (appInfo.isAppLockEnabled()) {
-                info.runtimeStatusFlags |= FLAG_APP_LOCK_ENABLED;
-            } else {
-                info.runtimeStatusFlags &= ~FLAG_APP_LOCK_ENABLED;
-            }
-        }
+        // LauncherEX: App Lock metadata is exposed only to system components; keep both states
+        // disabled so no unreachable shortcut is rendered.
+        info.runtimeStatusFlags &= ~(FLAG_APP_LOCK_SUPPORTED | FLAG_APP_LOCK_ENABLED);
 
         // Sets the progress level, installation and incremental download flags.
         info.setProgressLevel(

@@ -19,6 +19,7 @@
 -->
 <manifest
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.android.launcher3">
     <uses-sdk android:targetSdkVersion="33" android:minSdkVersion="30"/>
     <!--
@@ -26,9 +27,18 @@
     Refer comments around specific entries on how to extend individual components.
     -->
 
-    <!-- Permission required to start a WidgetPickerActivity. -->
-    <permission android:name="${applicationId}.permission.START_WIDGET_PICKER_ACTIVITY"
+    <!-- LauncherEX: use a package-specific permission so it can coexist with system Launcher3. -->
+    <permission android:name="com.android.launcher3.ex.permission.START_WIDGET_PICKER_ACTIVITY"
         android:protectionLevel="signature|privileged" />
+
+    <!-- LauncherEX: AndroidX otherwise redeclares a permission already owned by system Launcher3,
+         which PackageManager rejects as INSTALL_FAILED_DUPLICATE_PERMISSION. -->
+    <permission
+        android:name="com.android.launcher3.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+        tools:node="remove" />
+    <uses-permission
+        android:name="com.android.launcher3.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+        tools:node="remove" />
 
     <application
         android:backupAgent="com.android.launcher3.LauncherBackupAgent"
@@ -74,11 +84,13 @@
                 <category android:name="android.intent.category.MONKEY"/>
                 <category android:name="android.intent.category.LAUNCHER_APP" />
             </intent-filter>
+            <!-- LauncherEX: point clients at this package's unique provider authority. -->
             <meta-data
                 android:name="com.android.launcher3.grid.control"
-                android:value="${packageName}.grid_control" />
+                android:value="com.android.launcher3.ex.grid_control" />
         </activity>
 
+        <!-- LauncherEX: protect this exported activity with the renamed package permission. -->
         <activity android:name="com.android.launcher3.widgetpicker.WidgetPickerActivity"
             android:theme="@style/WidgetPickerActivityTheme"
             android:excludeFromRecents="true"
@@ -86,7 +98,7 @@
             android:launchMode="singleTop"
             android:exported="true"
             android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize"
-            android:permission="${applicationId}.permission.START_WIDGET_PICKER_ACTIVITY">
+            android:permission="com.android.launcher3.ex.permission.START_WIDGET_PICKER_ACTIVITY">
             <intent-filter>
                 <action android:name="android.intent.action.PICK" />
                 <category android:name="android.intent.category.DEFAULT" />

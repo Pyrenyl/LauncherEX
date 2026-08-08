@@ -17,6 +17,7 @@
 package com.android.launcher3.model
 
 import android.content.pm.LauncherApps
+import android.content.pm.LauncherUserInfo
 import android.content.pm.PackageInstaller.SessionInfo
 import android.content.pm.ShortcutInfo
 import android.os.UserHandle
@@ -41,7 +42,10 @@ import java.util.function.Consumer
  * Implementation of {@link LauncherApps#Callbacks} which converts various events to corresponding
  * model tasks
  */
-class ModelLauncherCallbacks(private var taskExecutor: Consumer<ModelUpdateTask>) :
+class ModelLauncherCallbacks(
+    private var taskExecutor: Consumer<ModelUpdateTask>,
+    private val userConfigChangedCallback: () -> Unit,
+) :
     LauncherApps.Callback(), InstallSessionTracker.Callback {
 
     override fun onPackageAdded(packageName: String, user: UserHandle) {
@@ -107,6 +111,11 @@ class ModelLauncherCallbacks(private var taskExecutor: Consumer<ModelUpdateTask>
 
     override fun onSessionFailure(packageName: String, user: UserHandle) {
         taskExecutor.accept(SessionFailureTask(packageName, user))
+    }
+
+    override fun onUserConfigChanged(launcherUserInfo: LauncherUserInfo) {
+        // LauncherEX: this is the public notification for private-space entry-point visibility.
+        userConfigChangedCallback()
     }
 
     override fun onPackageStateChanged(installInfo: PackageInstallInfo) {

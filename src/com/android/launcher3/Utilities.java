@@ -25,12 +25,8 @@ import static com.android.launcher3.icons.IconNormalizer.ICON_VISIBLE_AREA_FACTO
 import static com.android.launcher3.util.SplitConfigurationOptions.STAGE_POSITION_BOTTOM_OR_RIGHT;
 import static com.android.launcher3.util.SplitConfigurationOptions.STAGE_POSITION_TOP_OR_LEFT;
 import static com.android.launcher3.util.SplitConfigurationOptions.STAGE_TYPE_MAIN;
-import static com.android.window.flags.Flags.enableNonDefaultDisplaySplitBugfix;
-
 import android.app.ActivityManager;
 import android.app.ActivityOptions;
-import android.app.ActivityThread;
-import android.app.Instrumentation;
 import android.app.Person;
 import android.app.WallpaperManager;
 import android.content.Context;
@@ -143,10 +139,9 @@ public final class Utilities {
     }
 
     public static boolean isRunningInstrumentationTest() {
-        final var thread = ActivityThread.currentActivityThread();
-        if (thread == null) return false;
-        final Instrumentation instrumentation = thread.getInstrumentation();
-        return instrumentation != null && instrumentation.isInstrumenting();
+        // LauncherEX: ActivityThread instrumentation state is hidden API; production side-loaded
+        // builds are not instrumentation runners.
+        return false;
     }
 
     private static boolean sIsRunningInTestHarness = ActivityManager.isRunningInUserTestHarness();
@@ -931,7 +926,8 @@ public final class Utilities {
     public static boolean calculateIsLeftRightSplit(boolean allowLeftRightSplitInPortrait,
             DeviceProperties deviceProperties, boolean isExternalDisplay) {
         if (allowLeftRightSplitInPortrait && deviceProperties.isLargeScreen()) {
-            if (!isExternalDisplay || !enableNonDefaultDisplaySplitBugfix()) {
+            // LauncherEX: use the enabled bugfix branch without querying its hidden window flag.
+            if (!isExternalDisplay) {
                 return !deviceProperties.isLandscape();
             } else {
                 // If split is started in external display and the non_default_display_split
