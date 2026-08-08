@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <!-- LauncherEX: Soong supplied these base strings; standalone aapt needs local fallbacks. -->
+    <string name="widgets_full_sheet_search_bar_hint">Search</string>
+    <string name="widgets_full_sheet_cancel_button_description">Clear text from search box</string>
+    <string name="folder_name_format_exact">Folder: <xliff:g id="name">%1$s</xliff:g>, <xliff:g id="size">%2$d</xliff:g> items</string>
+    <string name="folder_name_format_overflow">Folder: <xliff:g id="name">%1$s</xliff:g>, <xliff:g id="size">%2$d</xliff:g> or more items</string>
+    <string name="allow_rotation_title">Allow home screen rotation</string>
+    <string name="item_added_to_workspace">Item added to home screen</string>
+    <string name="work_profile_edu_accept">Got it</string>
+</resources>

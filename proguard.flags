@@ -29,6 +29,10 @@
 # Prevent optimization or access modification of any referenced code that may
 # conflict with code in the bootclasspath.
 # TODO(b/222468116): Resolve such collisions in the build system.
+-keepclassmembers,allowoptimization class * extends com.google.protobuf.GeneratedMessageLite {
+    # LauncherEX: protobuf-lite resolves generated fields by their source names at runtime.
+    <fields>;
+}
 -keep interface com.android.launcher3.userevent.nano.LauncherLogProto.** {*;}
 -keep interface com.android.launcher3.model.nano.LauncherDumpProto.** {*;}
 -keep interface com.android.internal.protolog.common.IProtoLogGroup { *; }
@@ -66,11 +70,4 @@
 }
 -keep class androidx.lifecycle.LifecycleRegistry {
   *;
-}
-
-# Keep all classes annotated with @AppFunctionSerializable and their members.
-# These classes are serialized and their structure must be preserved.
--keep @androidx.appfunctions.AppFunctionSerializable class * {
-    <fields>;
-    <init>(...);
 }

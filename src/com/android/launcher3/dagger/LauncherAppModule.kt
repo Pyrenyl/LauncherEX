@@ -54,7 +54,7 @@ class BootSafeModules
             LauncherWidgetPickerModule::class,
             WidgetModule::class,
             StatsLoggerModule::class,
-            WorkspaceFunctionsLauncherModule::class,
+            // LauncherEX: AppFunctions workspace integration is outside the standalone scope.
             OrganizerLauncherModule::class,
         ]
 )

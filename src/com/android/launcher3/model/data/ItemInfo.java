@@ -40,10 +40,8 @@ import android.content.ComponentName;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Process;
 import android.os.UserHandle;
-import android.provider.Settings;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -66,7 +64,6 @@ import com.android.launcher3.logger.LauncherAtomExtensions.ExtendedContainers;
 import com.android.launcher3.pm.UserCache;
 import com.android.launcher3.util.ComponentKey;
 import com.android.launcher3.util.ContentWriter;
-import com.android.launcher3.util.SettingsCache;
 import com.android.launcher3.util.UserIconInfo;
 import com.android.systemui.shared.system.SysUiStatsLog;
 
@@ -83,9 +80,6 @@ public class ItemInfo {
 
     public static final boolean DEBUG = false;
     public static final int NO_ID = -1;
-
-    /** Hidden field Settings.Secure.NAV_BAR_KIDS_MODE */
-    private static final Uri NAV_BAR_KIDS_MODE = Settings.Secure.getUriFor("nav_bar_kids_mode");
 
     /**
      * The id in the settings database for this item
@@ -484,8 +478,8 @@ public class ItemInfo {
     @NonNull
     protected LauncherAtom.ItemInfo.Builder getDefaultItemInfoBuilder(Context context) {
         LauncherAtom.ItemInfo.Builder itemBuilder = LauncherAtom.ItemInfo.newBuilder();
-        itemBuilder.setIsKidsMode(
-                SettingsCache.INSTANCE.get(context).getValue(NAV_BAR_KIDS_MODE));
+        // LauncherEX: NAV_BAR_KIDS_MODE is a restricted Secure setting for system apps only.
+        itemBuilder.setIsKidsMode(false);
         itemBuilder.setUserType(getUserType(UserCache.INSTANCE.get(context).getUserInfo(user)));
         itemBuilder.setRank(rank);
         itemBuilder.addAllItemAttributes(mAttributeList);

@@ -64,7 +64,8 @@ class XmlElement(private val parser: XmlPullParser) {
      */
     operator fun get(attr: String): String? =
         parser.getAttributeValue(
-            "http://schemas.android.com/apk/res-auto/com.android.launcher3",
+            // LauncherEX: Gradle/aapt keeps the generic res-auto namespace in binary XML.
+            LAUNCHER_RES_AUTO_NAMESPACE,
             attr,
         ) ?: parser.getAttributeValue(null, attr)
 
@@ -80,7 +81,8 @@ class XmlElement(private val parser: XmlPullParser) {
         val attrs = Xml.asAttributeSet(parser)
         var value =
             attrs.getAttributeResourceValue(
-                "http://schemas.android.com/apk/res-auto/com.android.launcher3",
+                // LauncherEX: match the namespace used by standalone compiled resources.
+                LAUNCHER_RES_AUTO_NAMESPACE,
                 attr,
                 defaultValue,
             )
@@ -97,6 +99,9 @@ class XmlElement(private val parser: XmlPullParser) {
     }
 
     companion object {
+
+        private const val LAUNCHER_RES_AUTO_NAMESPACE =
+            "http://schemas.android.com/apk/res-auto"
 
         @JvmStatic
         @JvmOverloads

@@ -21,14 +21,12 @@ import static com.android.launcher3.util.WindowBlurState.WINDOW_BLUR_STATE;
 import android.content.Context;
 
 import androidx.annotation.Nullable;
-import androidx.annotation.VisibleForTesting;
 
 import com.android.launcher3.InvariantDeviceProfile;
 import com.android.launcher3.LauncherAppState;
 import com.android.launcher3.LauncherPrefs;
 import com.android.launcher3.MainProcessInitializer;
 import com.android.launcher3.RemoveAnimationSettingsTracker;
-import com.android.launcher3.appfunctions.workspace.WorkspaceAppFunctions;
 import com.android.launcher3.automation.AutomationRepository;
 import com.android.launcher3.backuprestore.LauncherRestoreEventLogger;
 import com.android.launcher3.display.DisplayController;
@@ -42,13 +40,11 @@ import com.android.launcher3.icons.IconChangeTracker;
 import com.android.launcher3.icons.LauncherIcons.IconPool;
 import com.android.launcher3.logging.DumpManager;
 import com.android.launcher3.logging.StatsLogManager;
-import com.android.launcher3.model.GridSizeMigrationLogic;
 import com.android.launcher3.model.ItemInstallQueue;
 import com.android.launcher3.model.LayoutParserFactory;
 import com.android.launcher3.model.LoaderCursor.LoaderCursorFactory;
 import com.android.launcher3.model.ModelProxyProvider;
 import com.android.launcher3.model.ModelWriterFactory;
-import com.android.launcher3.model.TestableModelState;
 import com.android.launcher3.model.repository.HomeScreenRepository;
 import com.android.launcher3.model.repository.StringCacheRepository;
 import com.android.launcher3.notification.NotificationRepository;
@@ -59,7 +55,6 @@ import com.android.launcher3.popup.PopupDataRepository;
 import com.android.launcher3.qsb.OSEManager;
 import com.android.launcher3.qsb.OseWidgetManager;
 import com.android.launcher3.qsb.QsbWidgetFactory;
-import com.android.launcher3.testing.TestInformationHandler;
 import com.android.launcher3.util.ApiWrapper;
 import com.android.launcher3.util.DaggerSingletonTracker;
 import com.android.launcher3.util.DefaultsValueProvider;
@@ -136,7 +131,6 @@ public interface LauncherBaseAppComponent {
     MainProcessInitializer getMainProcessInitializer();
     OseWidgetManager getOseWidgetManager();
     OSEManager getOseManager();
-    TestInformationHandler getTestInformationHandler();
     TaskbarModeUtil getTaskbarModeUtil();
     ProductionDispatchers getProductionDispatchers();
 
@@ -149,10 +143,7 @@ public interface LauncherBaseAppComponent {
     /** Returns new [ModelProxyProvider] */
     ModelProxyProvider getModelProxyProvider();
 
-    @VisibleForTesting
-    GridSizeMigrationLogic createNewGridSizeMigrationLogic();
-    /** Returns reference to various model objects used for test verification */
-    TestableModelState getTestableModelState();
+    // LauncherEX: AOSP test-only component bindings are intentionally omitted.
 
     /** Popup data mapping for [ItemInfo] */
     PopupDataRepository getPopupDataRepository();
@@ -181,8 +172,7 @@ public interface LauncherBaseAppComponent {
     /** Repository for workspace data */
     HomeScreenRepository getHomeScreenRepository();
 
-    /** Returns the WorkspaceAppFunctions instance */
-    WorkspaceAppFunctions getWorkspaceAppFunctions();
+    // LauncherEX: AppFunctions bindings are intentionally excluded.
 
     /** Provider for default values */
     DefaultsValueProvider getDefaultsValueProvider();

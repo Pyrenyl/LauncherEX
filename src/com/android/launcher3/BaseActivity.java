@@ -50,7 +50,6 @@ import com.android.launcher3.display.DisplayController;
 import com.android.launcher3.display.LauncherDisplayInfo;
 import com.android.launcher3.logging.StatsLogManager;
 import com.android.launcher3.model.data.ItemInfo;
-import com.android.launcher3.testing.TestInformationHandler;
 import com.android.launcher3.testing.TestLogging;
 import com.android.launcher3.testing.shared.TestProtocol;
 import com.android.launcher3.util.ActivityOptionsWrapper;
@@ -203,7 +202,7 @@ public abstract class BaseActivity extends Activity implements ActivityContext {
         mSavedStateRegistryController.performAttach();
         registerActivityLifecycleCallbacks(
                 new LifecycleHelper(this, mSavedStateRegistryController, mLifecycleRegistry));
-        TestInformationHandler.trackUiSurface(this);
+        // LauncherEX: AOSP test-surface tracking is excluded from the standalone app.
     }
 
     @Override
