@@ -159,6 +159,25 @@
             </intent-filter>
         </receiver>
 
+        <!--
+        LauncherEX: handle only the secure-camera action used while the device is locked.
+        The no-display activity locks Private Space immediately without replacing normal camera flows.
+        -->
+        <activity
+            android:name="com.android.launcher3.PrivateSpaceLockActivity"
+            android:excludeFromRecents="true"
+            android:exported="true"
+            android:label="@string/derived_app_name"
+            android:noHistory="true"
+            android:showWhenLocked="true"
+            android:taskAffinity=""
+            android:theme="@android:style/Theme.NoDisplay" >
+            <intent-filter>
+                <action android:name="android.media.action.STILL_IMAGE_CAMERA_SECURE" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
         <service
             android:name="com.android.launcher3.notification.NotificationListener"
             android:exported="true"
