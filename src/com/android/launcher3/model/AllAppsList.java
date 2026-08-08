@@ -67,6 +67,8 @@ public class AllAppsList {
 
     private static final String TAG = "AllAppsList";
     private static final boolean DEBUG = true;
+    private static final String SYNTHETIC_APP_DETAILS_ACTIVITY =
+            "android.app.AppDetailsActivity";
 
     public static final int DEFAULT_APPLICATIONS_NUMBER = 42;
 
@@ -259,8 +261,12 @@ public class AllAppsList {
         final UserCache userCache = UserCache.getInstance(context);
         final PackageManagerHelper pmHelper = PackageManagerHelper.INSTANCE.get(context);
         final AutomationRepository automationRepo = AutomationRepository.INSTANCE.get(context);
+        // LauncherEX: Android injects this settings-only activity for apps that hide their real
+        // launcher entry; omit it so package updates preserve the app's requested hidden state.
         final List<LauncherActivityInfo> matches = context.getSystemService(LauncherApps.class)
-                .getActivityList(packageName, user);
+                .getActivityList(packageName, user).stream()
+                .filter(info -> !isSyntheticAppDetailsActivity(info))
+                .toList();
 
         Map<ComponentName, LauncherActivityInfo> activityMap = matches.stream().collect(
                 Collectors.toMap(LauncherActivityInfo::getComponentName, lai -> lai,
@@ -295,6 +301,10 @@ public class AllAppsList {
         // Add any new activities to the list
         activityMap.values().forEach(lai -> add(new AppInfo(context, lai, user), lai));
         return matches;
+    }
+
+    static boolean isSyntheticAppDetailsActivity(LauncherActivityInfo info) {
+        return SYNTHETIC_APP_DETAILS_ACTIVITY.equals(info.getComponentName().getClassName());
     }
 
     public AppInfo[] copyData() {

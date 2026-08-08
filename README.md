@@ -9,6 +9,8 @@ Standalone, non-Quickstep Launcher3 fork for Android 17 / API 37.
 - Toggle Private Space from the dialer with `*#*#3825#*#*`.
 - Lock Private Space from the lock-screen camera shortcut or the locked-state double-press power
   gesture by selecting LauncherEX as the secure-camera handler.
+- Honor apps that hide their launcher entry instead of showing Android's synthetic app-info
+  shortcut.
 - Standalone Gradle build using only the public Android SDK and Maven dependencies.
 
 ```sh

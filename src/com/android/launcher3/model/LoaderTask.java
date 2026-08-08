@@ -649,7 +649,12 @@ public class LoaderTask implements Runnable {
             UserHandle user = iconInfo.user;
 
             // Query for the set of apps
-            final List<LauncherActivityInfo> apps = mLauncherApps.getActivityList(null, user);
+            // LauncherEX: honor apps which disable their launcher component instead of showing
+            // Android's synthetic shortcut that only opens the app-details settings page.
+            final List<LauncherActivityInfo> apps = mLauncherApps.getActivityList(null, user)
+                    .stream()
+                    .filter(info -> !AllAppsList.isSyntheticAppDetailsActivity(info))
+                    .toList();
             // Fail if we don't have any apps
             // TODO: Fix this. Only fail for the current user.
             if (apps == null || apps.isEmpty()) {
