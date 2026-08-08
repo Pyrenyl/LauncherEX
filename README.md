@@ -2,6 +2,15 @@
 
 Standalone, non-Quickstep Launcher3 fork for Android 17 / API 37.
 
+## Features
+
+- Launcher3 home screen, app drawer, folders, search, and widgets.
+- Private Space support, including hiding its entry point while locked.
+- Toggle Private Space from the dialer with `*#*#3825#*#*`.
+- Lock Private Space from the lock-screen camera shortcut or the locked-state double-press power
+  gesture by selecting LauncherEX as the secure-camera handler.
+- Standalone Gradle build using only the public Android SDK and Maven dependencies.
+
 ```sh
 ./gradlew assembleRelease
 ```
