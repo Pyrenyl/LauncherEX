@@ -2,6 +2,11 @@
 
 Standalone, non-Quickstep Launcher3 fork for Android 17 / API 37.
 
+## Upstream
+
+- Source baseline: [GrapheneOS Launcher3 `2026072900`](https://github.com/GrapheneOS/platform_packages_apps_Launcher3/tree/2026072900)
+- Original project: [AOSP Launcher3](https://android.googlesource.com/platform/packages/apps/Launcher3/)
+
 ## Features
 
 - Launcher3 home screen, app drawer, folders, search, and widgets.
