@@ -360,17 +360,19 @@ public class RecyclerViewFastScroller extends View {
         animatePopupVisibility(!TextUtils.isEmpty(sectionName));
         mLastTouchY = boundedY;
         setThumbOffsetY((int) mLastTouchY);
-        updateFastScrollerLetterList(y);
+        updateFastScrollerLetterList(y, sectionName);
     }
 
-    private void updateFastScrollerLetterList(int y) {
+    private void updateFastScrollerLetterList(int y, CharSequence selectedSectionName) {
         if (!shouldUseLetterFastScroller()) {
             return;
         }
         ConstraintLayout mLetterList = mRv.getLetterList();
         for (int i = 0; i < mLetterList.getChildCount(); i++) {
             LetterListTextView currentLetter = (LetterListTextView) mLetterList.getChildAt(i);
-            currentLetter.animateBasedOnYPosition(y + mTouchOffsetY);
+            // LauncherEX: keep the active section fully opaque even between letter centers.
+            currentLetter.animateBasedOnYPosition(y + mTouchOffsetY,
+                    TextUtils.equals(selectedSectionName, currentLetter.getText()));
         }
     }
 
@@ -496,8 +498,17 @@ public class RecyclerViewFastScroller extends View {
         if (mPopupVisible != visible) {
             mPopupVisible = visible;
             if (shouldUseLetterFastScroller()) {
-                mRv.getLetterList().animate().alpha(visible ? 1f : 0f)
-                        .setDuration(visible ? 200 : 150).start();
+                // LauncherEX: animate each letter instead of the narrow parent container;
+                // a translucent parent uses a bounded layer that clips translated children.
+                ConstraintLayout letterList = mRv.getLetterList();
+                letterList.animate().cancel();
+                letterList.setAlpha(1f);
+                for (int i = 0; i < letterList.getChildCount(); i++) {
+                    View letter = letterList.getChildAt(i);
+                    letter.animate().cancel();
+                    letter.animate().alpha(visible ? 1f : 0f)
+                            .setDuration(visible ? 200 : 150).start();
+                }
             } else {
                 mPopupView.animate().cancel();
                 mPopupView.animate().alpha(visible ? 1f : 0f)

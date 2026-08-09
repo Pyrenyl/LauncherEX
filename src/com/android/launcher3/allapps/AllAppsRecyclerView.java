@@ -408,8 +408,11 @@ public class AllAppsRecyclerView extends FastScrollRecyclerView {
         mLetterList.addView(lastLetterListTextView);
         constraintTextViewsVertically(mLetterList, textViews);
         mLetterList.setVisibility(VISIBLE);
-        // Set the alpha to 0 to avoid the letter list being shown when it shouldn't be.
-        mLetterList.setAlpha(0);
+        // LauncherEX: keep the parent opaque so its alpha layer cannot clip transformed letters.
+        mLetterList.setAlpha(1);
+        for (LetterListTextView textView : textViews) {
+            textView.setAlpha(0);
+        }
     }
 
     private void constraintTextViewsVertically(ConstraintLayout constraintLayout,

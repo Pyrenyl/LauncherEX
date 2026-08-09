@@ -36,8 +36,16 @@ import com.android.launcher3.Utilities;
  * A TextView that is used to display the letter list in the fast scroller.
  */
 public class LetterListTextView extends TextView {
-    private static final float ABSOLUTE_TRANSLATION_X = 30f;
-    private static final float ABSOLUTE_SCALE = 1.4f;
+    // LauncherEX: pull the active letters farther into the app drawer while scrubbing.
+    private static final float ABSOLUTE_TRANSLATION_X = 90f;
+    // LauncherEX: enlarge the active letter enough to distinguish it from adjacent sections.
+    private static final float ABSOLUTE_SCALE = 3f;
+    // LauncherEX: let nearby letters participate in the magnification more noticeably.
+    private static final float ANIMATION_RANGE_IN_LETTER_HEIGHTS = 5f;
+    // LauncherEX: increase this to make the selected letter stand out more sharply.
+    private static final float MAGNIFICATION_FALLOFF_POWER = 12f;
+    // LauncherEX: keep distant letters visible while emphasizing the selected letter.
+    private static final float MINIMUM_ALPHA = 0.5f;
     private final Drawable mLetterBackground;
     private final int mLetterListTextWidthAndHeight;
     private final int mTextColor;
@@ -89,29 +97,40 @@ public class LetterListTextView extends TextView {
      * @param currentFingerY The Y position of where the finger is placed on the fastScroller in
      *                       pixels.
      */
-    public void animateBasedOnYPosition(int currentFingerY) {
+    public void animateBasedOnYPosition(int currentFingerY, boolean isSelected) {
         if (getBackground() == null) {
             return;
         }
-        float cutOffMin = currentFingerY - (getHeight() * 2);
-        float cutOffMax = currentFingerY + (getHeight() * 2);
+        float cutOffMin = currentFingerY
+                - (getHeight() * ANIMATION_RANGE_IN_LETTER_HEIGHTS);
+        float cutOffMax = currentFingerY
+                + (getHeight() * ANIMATION_RANGE_IN_LETTER_HEIGHTS);
         float cutOffDistance = cutOffMax - cutOffMin;
         boolean isWithinAnimationBounds = getY() < cutOffMax && getY() > cutOffMin;
+        // LauncherEX: stop the initial fade-in from overriding distance-based letter opacity.
+        animate().cancel();
         translateBasedOnYPosition(currentFingerY, cutOffDistance, isWithinAnimationBounds);
-        scaleBasedOnYPosition(currentFingerY, cutOffDistance, isWithinAnimationBounds);
+        scaleBasedOnYPosition(
+                currentFingerY, cutOffDistance, isWithinAnimationBounds, isSelected);
     }
 
     private void scaleBasedOnYPosition(int y, float cutOffDistance,
-            boolean isWithinAnimationBounds) {
-        float raisedCosineScale = (float) Math.cos(((y - getY()) / (cutOffDistance)) * Math.PI)
-                * ABSOLUTE_SCALE;
+            boolean isWithinAnimationBounds, boolean isSelected) {
         if (isWithinAnimationBounds) {
-            raisedCosineScale = Utilities.boundToRange(raisedCosineScale, 1f, ABSOLUTE_SCALE);
+            float cosine = (float) Math.cos(((y - getY()) / cutOffDistance) * Math.PI);
+            float scaleProgress = (float) Math.pow(
+                    Math.max(0f, cosine), MAGNIFICATION_FALLOFF_POWER);
+            float raisedCosineScale = 1f + (ABSOLUTE_SCALE - 1f) * scaleProgress;
             setScaleX(raisedCosineScale);
             setScaleY(raisedCosineScale);
+            // LauncherEX: map the existing scale curve to a 50%-100% opacity transition.
+            setAlpha(isSelected
+                    ? 1f
+                    : MINIMUM_ALPHA + scaleProgress * (1f - MINIMUM_ALPHA));
         } else {
-            setScaleX(1);
-            setScaleY(1);
+            setScaleX(1f);
+            setScaleY(1f);
+            setAlpha(isSelected ? 1f : MINIMUM_ALPHA);
         }
     }
 

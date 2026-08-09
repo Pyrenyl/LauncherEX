@@ -524,7 +524,8 @@ public final class Flags {
         return true;
     }
     public static boolean letterFastScroller() {
-        return false;
+        // LauncherEX: enable Launcher3's built-in alphabet fast scroller in the app drawer.
+        return true;
     }
     public static boolean modelRepository() {
         return true;
