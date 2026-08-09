@@ -302,6 +302,12 @@ public class ActivityAllAppsContainerView<T extends Context & ActivityContext>
         mAH.get(SEARCH).setup(mSearchRecyclerView,
                 /* Filter out A-Z apps */ itemInfo -> false);
         rebindAdapters(true /* force */);
+        if (mHasPrivateApps) {
+            // LauncherEX: The store may already be populated when this view is recreated after a
+            // user switch, so resolve the state and rebuild items without waiting for an update.
+            mPrivateProfileManager.reset();
+            mAH.get(MAIN).mAppsList.updateAdapterItems();
+        }
         float cornerRadius = Themes.getDialogCornerRadius(getContext());
         mBottomSheetCornerRadii = new float[]{
                 cornerRadius,
