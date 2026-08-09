@@ -18,7 +18,9 @@ package com.android.launcher3.allapps.search;
 import static com.android.launcher3.allapps.BaseAllAppsAdapter.VIEW_TYPE_EMPTY_SEARCH;
 
 import android.content.Context;
+import android.icu.text.Transliterator;
 import android.os.Handler;
+import android.util.LruCache;
 
 import androidx.annotation.AnyThread;
 
@@ -39,6 +41,11 @@ import java.util.List;
 public class DefaultAppSearchAlgorithm implements SearchAlgorithm<AdapterItem> {
 
     private static final int MAX_RESULTS_COUNT = 5;
+    // LauncherEX: use Android's built-in ICU data for Chinese initials instead of bundling a
+    // separate pinyin library, and cache labels because this search runs after every keystroke.
+    private static final Transliterator PINYIN_TRANSLITERATOR = Transliterator.getInstance(
+            "Han-Latin; Latin-ASCII; Lower()");
+    private static final LruCache<String, String> PINYIN_INITIALS_CACHE = new LruCache<>(256);
 
     private final LauncherAppState mAppState;
     private final Handler mResultHandler;
@@ -98,11 +105,69 @@ public class DefaultAppSearchAlgorithm implements SearchAlgorithm<AdapterItem> {
         int total = apps.size();
         for (int i = 0; i < total && resultCount < MAX_RESULTS_COUNT; i++) {
             AppInfo info = apps.get(i);
-            if (StringMatcherUtility.matches(queryTextLower, info.title.toString(), matcher)) {
+            String title = info.title.toString();
+            // LauncherEX: keep Launcher3's normal title matching and add pinyin initials only as
+            // an alternative, so existing searches retain their behavior and ordering.
+            if (StringMatcherUtility.matches(queryTextLower, title, matcher)
+                    || matchesPinyinInitials(queryTextLower, title)) {
                 result.add(AdapterItem.asApp(info));
                 resultCount++;
             }
         }
         return result;
+    }
+
+    private static boolean matchesPinyinInitials(String query, String title) {
+        if (!containsOnlyAsciiLetters(query) || !containsHan(title)) {
+            return false;
+        }
+
+        String initials = PINYIN_INITIALS_CACHE.get(title);
+        if (initials == null) {
+            initials = extractInitials(PINYIN_TRANSLITERATOR.transliterate(title));
+            PINYIN_INITIALS_CACHE.put(title, initials);
+        }
+        return initials.startsWith(query);
+    }
+
+    private static boolean containsOnlyAsciiLetters(String value) {
+        if (value.isEmpty()) {
+            return false;
+        }
+        for (int i = 0; i < value.length(); i++) {
+            char character = value.charAt(i);
+            if (character < 'a' || character > 'z') {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private static boolean containsHan(String value) {
+        for (int i = 0; i < value.length();) {
+            int codePoint = value.codePointAt(i);
+            if (Character.UnicodeScript.of(codePoint) == Character.UnicodeScript.HAN) {
+                return true;
+            }
+            i += Character.charCount(codePoint);
+        }
+        return false;
+    }
+
+    private static String extractInitials(String transliteratedTitle) {
+        StringBuilder initials = new StringBuilder();
+        boolean atWordStart = true;
+        for (int i = 0; i < transliteratedTitle.length(); i++) {
+            char character = transliteratedTitle.charAt(i);
+            if (character >= 'a' && character <= 'z') {
+                if (atWordStart) {
+                    initials.append(character);
+                }
+                atWordStart = false;
+            } else {
+                atWordStart = true;
+            }
+        }
+        return initials.toString();
     }
 }
