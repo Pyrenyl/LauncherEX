@@ -121,6 +121,8 @@ public class LetterListTextView extends TextView {
             float scaleProgress = (float) Math.pow(
                     Math.max(0f, cosine), MAGNIFICATION_FALLOFF_POWER);
             float raisedCosineScale = 1f + (ABSOLUTE_SCALE - 1f) * scaleProgress;
+            // LauncherEX: stack nearer letters above farther ones, with the selected letter first.
+            setTranslationZ(isSelected ? 2f : scaleProgress);
             setScaleX(raisedCosineScale);
             setScaleY(raisedCosineScale);
             // LauncherEX: map the existing scale curve to a 50%-100% opacity transition.
@@ -128,6 +130,7 @@ public class LetterListTextView extends TextView {
                     ? 1f
                     : MINIMUM_ALPHA + scaleProgress * (1f - MINIMUM_ALPHA));
         } else {
+            setTranslationZ(isSelected ? 2f : 0f);
             setScaleX(1f);
             setScaleY(1f);
             setAlpha(isSelected ? 1f : MINIMUM_ALPHA);

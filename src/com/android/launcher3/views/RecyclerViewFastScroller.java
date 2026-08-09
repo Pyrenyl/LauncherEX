@@ -360,19 +360,35 @@ public class RecyclerViewFastScroller extends View {
         animatePopupVisibility(!TextUtils.isEmpty(sectionName));
         mLastTouchY = boundedY;
         setThumbOffsetY((int) mLastTouchY);
-        updateFastScrollerLetterList(y, sectionName);
+        updateFastScrollerLetterList(boundedY + mThumbHeight / 2f, sectionName);
     }
 
-    private void updateFastScrollerLetterList(int y, CharSequence selectedSectionName) {
+    private void updateFastScrollerLetterList(
+            float scrollerCenterY, CharSequence selectedSectionName) {
         if (!shouldUseLetterFastScroller()) {
             return;
         }
         ConstraintLayout mLetterList = mRv.getLetterList();
+        LetterListTextView selectedLetter = null;
+        float selectedDistance = Float.MAX_VALUE;
+        for (int i = 0; i < mLetterList.getChildCount(); i++) {
+            LetterListTextView letter = (LetterListTextView) mLetterList.getChildAt(i);
+            if (letter.getVisibility() != VISIBLE
+                    || !TextUtils.equals(selectedSectionName, letter.getText())) {
+                continue;
+            }
+            float distance = Math.abs(letter.getY() - scrollerCenterY);
+            if (distance < selectedDistance) {
+                selectedLetter = letter;
+                selectedDistance = distance;
+            }
+        }
+        // LauncherEX: use the continuous thumb center for motion while section state selects Z/alpha.
+        int animationCenterY = Math.round(scrollerCenterY);
         for (int i = 0; i < mLetterList.getChildCount(); i++) {
             LetterListTextView currentLetter = (LetterListTextView) mLetterList.getChildAt(i);
-            // LauncherEX: keep the active section fully opaque even between letter centers.
-            currentLetter.animateBasedOnYPosition(y + mTouchOffsetY,
-                    TextUtils.equals(selectedSectionName, currentLetter.getText()));
+            currentLetter.animateBasedOnYPosition(
+                    animationCenterY, currentLetter == selectedLetter);
         }
     }
 
