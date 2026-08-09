@@ -16,6 +16,7 @@
 package com.android.launcher3.allapps.search;
 
 import static com.android.launcher3.allapps.BaseAllAppsAdapter.VIEW_TYPE_EMPTY_SEARCH;
+import static com.android.launcher3.model.data.ItemInfoWithIcon.FLAG_DISABLED_QUIET_USER;
 
 import android.content.Context;
 import android.icu.text.Transliterator;
@@ -105,6 +106,11 @@ public class DefaultAppSearchAlgorithm implements SearchAlgorithm<AdapterItem> {
         int total = apps.size();
         for (int i = 0; i < total && resultCount < MAX_RESULTS_COUNT; i++) {
             AppInfo info = apps.get(i);
+            // LauncherEX: the model retains apps from locked Private Space and paused profiles;
+            // never expose those quiet-profile entries through either search matching path.
+            if ((info.runtimeStatusFlags & FLAG_DISABLED_QUIET_USER) != 0) {
+                continue;
+            }
             String title = info.title.toString();
             // LauncherEX: keep Launcher3's normal title matching and add pinyin initials only as
             // an alternative, so existing searches retain their behavior and ordering.
