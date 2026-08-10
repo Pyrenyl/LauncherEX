@@ -336,6 +336,8 @@ public class RecyclerViewFastScroller extends View {
     }
 
     private void calcTouchOffsetAndPrepToFastScroll(int downY, int lastY) {
+        // LauncherEX: prepare the optional letter list before its first visibility animation.
+        mRv.onFastScrollStart();
         mIsDragging = true;
         if (mCanThumbDetach) {
             mIsThumbDetached = true;

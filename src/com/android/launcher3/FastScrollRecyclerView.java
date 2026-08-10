@@ -173,6 +173,9 @@ public abstract class FastScrollRecyclerView extends RecyclerView  {
         return null;
     }
 
+    /** LauncherEX: called immediately before fast-scroll visuals are shown. */
+    public void onFastScrollStart() {}
+
     /**
      * <p>Override in each subclass of this base class.
      */

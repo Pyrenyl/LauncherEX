@@ -250,6 +250,14 @@ public class AllAppsRecyclerView extends FastScrollRecyclerView {
     }
 
     @Override
+    public void onFastScrollStart() {
+        if (mApps != null && LauncherPrefs.LETTER_FAST_SCROLLER.get(getContext())) {
+            // LauncherEX: build letters before the first drag's visibility animation starts.
+            setLettersToScrollLayout(mApps.getFastScrollerSections());
+        }
+    }
+
+    @Override
     public void onFastScrollCompleted() {
         super.onFastScrollCompleted();
         mFastScrollHelper.onFastScrollCompleted();
@@ -288,10 +296,6 @@ public class AllAppsRecyclerView extends FastScrollRecyclerView {
             return;
         }
 
-        if (LauncherPrefs.LETTER_FAST_SCROLLER.get(getContext())
-                && !mScrollbar.isDraggingThumb()) {
-            setLettersToScrollLayout(mApps.getFastScrollerSections());
-        }
         // Only show the scrollbar if there is height to be scrolled
         int availableScrollBarHeight = getAvailableScrollBarHeight();
         int availableScrollHeight = getAvailableScrollHeight();
