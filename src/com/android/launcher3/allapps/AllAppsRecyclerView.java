@@ -31,6 +31,7 @@ import static com.android.launcher3.util.LogConfig.SEARCH_LOGGING;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.InputDevice;
@@ -374,11 +375,14 @@ public class AllAppsRecyclerView extends FastScrollRecyclerView {
 
     public void setLettersToScrollLayout(
             List<AlphabeticalAppsList.FastScrollSectionInfo> fastScrollSections) {
-        if (fastScrollSections.isEmpty()) {
+        if (isLetterListCurrent(fastScrollSections)) {
             return;
         }
         if (mLetterList != null) {
             mLetterList.removeAllViews();
+        }
+        if (fastScrollSections.isEmpty()) {
+            return;
         }
         Context context = getContext();
         ActivityAllAppsContainerView<?> allAppsContainerView =
@@ -415,6 +419,20 @@ public class AllAppsRecyclerView extends FastScrollRecyclerView {
         for (LetterListTextView textView : textViews) {
             textView.setAlpha(0);
         }
+    }
+
+    private boolean isLetterListCurrent(
+            List<AlphabeticalAppsList.FastScrollSectionInfo> fastScrollSections) {
+        if (mLetterList == null || mLetterList.getChildCount() != fastScrollSections.size() + 1) {
+            return false;
+        }
+        for (int i = 0; i < fastScrollSections.size(); i++) {
+            TextView letter = (TextView) mLetterList.getChildAt(i);
+            if (!TextUtils.equals(letter.getText(), fastScrollSections.get(i).sectionName)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private void constraintTextViewsVertically(ConstraintLayout constraintLayout,
