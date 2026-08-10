@@ -27,7 +27,7 @@
 
     <!-- LauncherEX: use a package-specific permission so it can coexist with system Launcher3. -->
     <permission
-        android:name="com.android.launcher3.ex.permission.START_WIDGET_PICKER_ACTIVITY"
+        android:name="${applicationId}.permission.START_WIDGET_PICKER_ACTIVITY"
         android:protectionLevel="signature|privileged" />
     <!--
     The manifest defines the common entries that should be present in any derivative of Launcher3.
@@ -52,11 +52,11 @@
     <uses-permission android:name="android.permission.ACCESS_HIDDEN_PROFILES" />
     <!-- LauncherEX: package-scoped permissions must not collide with the system Launcher3. -->
     <permission
-        android:name="com.android.launcher3.ex.permission.GRID_CONTROL"
+        android:name="${applicationId}.permission.GRID_CONTROL"
         android:knownCerts="@array/grid_control_known_signers"
         android:protectionLevel="signature|knownSigner" />
 
-    <uses-permission android:name="com.android.launcher3.ex.permission.GRID_CONTROL" />
+    <uses-permission android:name="${applicationId}.permission.GRID_CONTROL" />
     <application
         android:name="com.android.launcher3.LauncherApplication"
         android:appComponentFactory="androidx.core.app.CoreComponentFactory"
@@ -101,7 +101,7 @@
             <!-- LauncherEX: point clients at this package's unique provider authority. -->
             <meta-data
                 android:name="com.android.launcher3.grid.control"
-                android:value="com.android.launcher3.ex.grid_control" />
+                android:value="${applicationId}.grid_control" />
         </activity>
 
         <!-- LauncherEX: protect this exported activity with the renamed package permission. -->
@@ -112,7 +112,7 @@
             android:excludeFromRecents="true"
             android:exported="true"
             android:launchMode="singleTop"
-            android:permission="com.android.launcher3.ex.permission.START_WIDGET_PICKER_ACTIVITY"
+            android:permission="${applicationId}.permission.START_WIDGET_PICKER_ACTIVITY"
             android:theme="@style/WidgetPickerActivityTheme" >
             <intent-filter>
                 <action android:name="android.intent.action.PICK" />
@@ -211,7 +211,7 @@
         <!-- LauncherEX: use a unique authority so both launcher packages can be installed. -->
         <provider
             android:name="com.android.launcher3.LauncherProvider"
-            android:authorities="com.android.launcher3.ex.settings"
+            android:authorities="${applicationId}.settings"
             android:exported="true"
             android:readPermission="android.permission.ACCESS_LAUNCHER_DATA"
             android:writePermission="android.permission.ACCESS_LAUNCHER_DATA" />
@@ -224,7 +224,7 @@
         <!-- LauncherEX: keep grid-control IPC inside the renamed package namespace. -->
         <provider
             android:name="com.android.launcher3.graphics.LauncherCustomizationProvider"
-            android:authorities="com.android.launcher3.ex.grid_control"
+            android:authorities="${applicationId}.grid_control"
             android:exported="true" />
 <!--         The settings activity. To extend point settings_fragment_name to appropriate fragment class -->
         <activity
