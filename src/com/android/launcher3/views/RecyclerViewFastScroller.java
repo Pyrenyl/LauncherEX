@@ -48,6 +48,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.android.launcher3.FastScrollRecyclerView;
 import com.android.launcher3.Flags;
+import com.android.launcher3.LauncherPrefs;
 import com.android.launcher3.R;
 import com.android.launcher3.Utilities;
 import com.android.launcher3.allapps.LetterListTextView;
@@ -457,7 +458,7 @@ public class RecyclerViewFastScroller extends View {
     }
 
     boolean shouldUseLetterFastScroller() {
-        return Flags.letterFastScroller()
+        return LauncherPrefs.LETTER_FAST_SCROLLER.get(getContext())
                 && getScrollerLocation() == FastScrollerLocation.ALL_APPS_SCROLLER;
     }
 

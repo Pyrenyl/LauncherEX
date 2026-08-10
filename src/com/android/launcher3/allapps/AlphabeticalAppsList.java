@@ -33,6 +33,7 @@ import androidx.annotation.VisibleForTesting;
 import androidx.recyclerview.widget.DiffUtil;
 
 import com.android.launcher3.Flags;
+import com.android.launcher3.LauncherPrefs;
 import com.android.launcher3.R;
 import com.android.launcher3.allapps.BaseAllAppsAdapter.AdapterItem;
 import com.android.launcher3.model.data.AppInfo;
@@ -126,7 +127,8 @@ public class AlphabeticalAppsList implements AllAppsStore.OnUpdateListener {
             mAllAppsStore.addUpdateListener(this);
         }
         mPrivateProfileAppScrollerBadge = new SpannableString(" ");
-        mPrivateProfileAppScrollerBadge.setSpan(new ImageSpan(context, Flags.letterFastScroller()
+        mPrivateProfileAppScrollerBadge.setSpan(new ImageSpan(context,
+                        LauncherPrefs.LETTER_FAST_SCROLLER.get(context)
                         ? R.drawable.ic_private_profile_letter_list_fast_scroller_badge :
                         R.drawable.ic_private_profile_app_scroller_badge, ImageSpan.ALIGN_CENTER),
                 0, 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -412,7 +414,7 @@ public class AlphabeticalAppsList implements AllAppsStore.OnUpdateListener {
         position = addAppsWithSections(split.get(true), position);
         // Add system apps separator.
         position = mPrivateProviderManager.addSystemAppsDivider(mAdapterItems);
-        if (Flags.letterFastScroller()) {
+        if (LauncherPrefs.LETTER_FAST_SCROLLER.get(mActivityContext.asContext())) {
             FastScrollSectionInfo sectionInfo =
                     new FastScrollSectionInfo(mPrivateProfileDividerBadge, position);
             mFastScrollerSections.add(sectionInfo);
@@ -450,7 +452,9 @@ public class AlphabeticalAppsList implements AllAppsStore.OnUpdateListener {
                 Log.d(TAG, "addAppsWithSections: adding sectionName: " + sectionName
                     + " with appInfoTitle: " + info.title);
                 lastSectionName = sectionName;
-                boolean usePrivateAppScrollerBadge = !Flags.letterFastScroller() && hasPrivateApps;
+                boolean usePrivateAppScrollerBadge =
+                        !LauncherPrefs.LETTER_FAST_SCROLLER.get(mActivityContext.asContext())
+                                && hasPrivateApps;
                 FastScrollSectionInfo sectionInfo = new FastScrollSectionInfo(
                         usePrivateAppScrollerBadge ?
                                 mPrivateProfileAppScrollerBadge : sectionName, position);

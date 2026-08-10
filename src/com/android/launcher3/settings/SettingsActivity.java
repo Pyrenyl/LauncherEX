@@ -23,6 +23,7 @@ import static androidx.preference.PreferenceFragmentCompat.ARG_PREFERENCE_ROOT;
 import static com.android.launcher3.BuildConfig.IS_STUDIO_BUILD;
 import static com.android.launcher3.InvariantDeviceProfile.TYPE_MULTI_DISPLAY;
 import static com.android.launcher3.InvariantDeviceProfile.TYPE_TABLET;
+import static com.android.launcher3.LauncherPrefs.LETTER_FAST_SCROLLER_KEY;
 import static com.android.launcher3.util.Executors.MAIN_EXECUTOR;
 
 import android.app.Activity;
@@ -53,6 +54,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.android.launcher3.BuildConfig;
 import com.android.launcher3.InvariantDeviceProfile;
+import com.android.launcher3.Launcher;
 import com.android.launcher3.LauncherFiles;
 import com.android.launcher3.R;
 import com.android.launcher3.display.DisplayController;
@@ -328,6 +330,18 @@ public class SettingsActivity extends FragmentActivity
                             }
                     );
                     return !info.isLargeScreen(info.realBounds);
+                case LETTER_FAST_SCROLLER_KEY:
+                    preference.setOnPreferenceChangeListener((pref, newValue) -> {
+                        // LauncherEX: rebuild sections after the preference has been persisted.
+                        getListView().post(() -> {
+                            Launcher launcher = Launcher.ACTIVITY_TRACKER.getCreatedContext();
+                            if (launcher != null) {
+                                launcher.getAppsView().getPersonalAppList().updateAdapterItems();
+                            }
+                        });
+                        return true;
+                    });
+                    return true;
             }
             return true;
         }

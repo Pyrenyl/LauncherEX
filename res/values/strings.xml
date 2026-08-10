@@ -680,6 +680,10 @@
     <!-- Displayed when an error occurs but exact causality cannot be determined/communicated. -->
     <string name="something_went_wrong">Something went wrong</string>
 
+    <!-- LauncherEX app drawer preferences -->
+    <string name="letter_fast_scroller_title">Alphabet fast scrolling</string>
+    <string name="letter_fast_scroller_description">Show an alphabet index in the app drawer</string>
+
     <!-- Categories for home screen topics -->
     <string name="topic_category_games" translatable="false">Games</string>
     <string name="topic_category_audio" translatable="false">Audio</string>

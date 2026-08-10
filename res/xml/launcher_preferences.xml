@@ -37,4 +37,11 @@
         launcher:logIdOn="613"
         launcher:logIdOff="614" />
 
+    <SwitchPreference
+        android:key="pref_letter_fast_scroller"
+        android:title="@string/letter_fast_scroller_title"
+        android:summary="@string/letter_fast_scroller_description"
+        android:defaultValue="false"
+        android:persistent="true" />
+
 </androidx.preference.PreferenceScreen>

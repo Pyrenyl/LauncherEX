@@ -51,6 +51,7 @@ import com.android.launcher3.ExtendedEditText;
 import com.android.launcher3.FastScrollRecyclerView;
 import com.android.launcher3.Flags;
 import com.android.launcher3.LauncherAppState;
+import com.android.launcher3.LauncherPrefs;
 import com.android.launcher3.R;
 import com.android.launcher3.Utilities;
 import com.android.launcher3.logging.StatsLogManager;
@@ -286,7 +287,8 @@ public class AllAppsRecyclerView extends FastScrollRecyclerView {
             return;
         }
 
-        if (Flags.letterFastScroller() && !mScrollbar.isDraggingThumb()) {
+        if (LauncherPrefs.LETTER_FAST_SCROLLER.get(getContext())
+                && !mScrollbar.isDraggingThumb()) {
             setLettersToScrollLayout(mApps.getFastScrollerSections());
         }
         // Only show the scrollbar if there is height to be scrolled

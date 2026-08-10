@@ -254,12 +254,15 @@ constructor(@ApplicationContext private val encryptedContext: Context) {
         const val TASKBAR_PINNING_DESKTOP_MODE_KEY = "TASKBAR_PINNING_DESKTOP_MODE_KEY"
 
         const val ENABLE_TWO_LINE_TOGGLE_KEY: String = "pref_enable_two_line_toggle"
+        const val LETTER_FAST_SCROLLER_KEY: String = "pref_letter_fast_scroller"
 
         @JvmField
         val ENABLE_TWOLINE_ALLAPPS_TOGGLE =
             backedUpItem(ENABLE_TWO_LINE_TOGGLE_KEY, Boolean::class.java) { context ->
                 DefaultsValueProvider.get(context).enableTwoLineToggle
             }
+
+        @JvmField val LETTER_FAST_SCROLLER = backedUpItem(LETTER_FAST_SCROLLER_KEY, false)
 
         @JvmField
         val PROMISE_ICON_IDS = nonRestorableItem(InstallSessionHelper.PROMISE_ICON_IDS, "")
