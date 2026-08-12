@@ -683,6 +683,8 @@
     <!-- LauncherEX app drawer preferences -->
     <string name="letter_fast_scroller_title">Alphabet fast scrolling</string>
     <string name="letter_fast_scroller_description">Show an alphabet index in the app drawer</string>
+    <string name="app_bubbles_title">Open apps in bubbles</string>
+    <string name="app_bubbles_description">Show this option in app icon menus</string>
 
     <!-- Categories for home screen topics -->
     <string name="topic_category_games" translatable="false">Games</string>

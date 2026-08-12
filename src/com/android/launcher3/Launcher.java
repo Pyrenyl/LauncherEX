@@ -16,6 +16,8 @@
 
 package com.android.launcher3;
 
+import static android.app.PendingIntent.FLAG_MUTABLE;
+import static android.app.PendingIntent.FLAG_UPDATE_CURRENT;
 import static android.content.pm.ActivityInfo.CONFIG_UI_MODE;
 import static android.view.WindowInsetsAnimation.Callback.DISPATCH_MODE_CONTINUE_ON_SUBTREE;
 import static android.view.accessibility.AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED;
@@ -89,6 +91,7 @@ import static com.android.launcher3.model.ItemInstallQueue.FLAG_DRAG_AND_DROP;
 import static com.android.launcher3.model.data.ItemInfoWithIcon.FLAG_NOT_PINNABLE;
 import static com.android.launcher3.popup.SystemShortcut.ADD_TO_HOME_SCREEN;
 import static com.android.launcher3.popup.SystemShortcut.APP_INFO;
+import static com.android.launcher3.popup.SystemShortcut.BUBBLE_SHORTCUT;
 import static com.android.launcher3.popup.SystemShortcut.INSTALL;
 import static com.android.launcher3.popup.SystemShortcut.REMOVE;
 import static com.android.launcher3.popup.SystemShortcut.WIDGETS;
@@ -100,10 +103,16 @@ import static com.android.launcher3.util.Executors.MAIN_EXECUTOR;
 import static com.android.launcher3.util.ItemInfoMatcher.forFolderMatch;
 import static com.android.launcher3.util.SettingsCache.TOUCHPAD_NATURAL_SCROLLING;
 
+import android.Manifest;
 import android.animation.Animator;
 import android.animation.AnimatorSet;
 import android.animation.ValueAnimator;
 import android.annotation.TargetApi;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.app.Person;
 import android.appwidget.AppWidgetHostView;
 import android.appwidget.AppWidgetManager;
 import android.content.ActivityNotFoundException;
@@ -112,14 +121,22 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
+import android.content.pm.ShortcutInfo;
+import android.content.pm.ShortcutManager;
 import android.content.res.Configuration;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.Icon;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Process;
 import android.os.SystemClock;
 import android.os.Trace;
 import android.os.UserHandle;
@@ -195,6 +212,7 @@ import com.android.launcher3.pm.PinRequestHelper;
 import com.android.launcher3.popup.PopupContainer;
 import com.android.launcher3.popup.PopupController;
 import com.android.launcher3.popup.SystemShortcut;
+import com.android.launcher3.popup.SystemShortcut.BubbleActivityStarter;
 import com.android.launcher3.popup.WorkspaceLongPressOptions;
 import com.android.launcher3.statemanager.StateManager;
 import com.android.launcher3.statemanager.StateManager.StateHandler;
@@ -249,6 +267,7 @@ import com.android.launcher3.widget.picker.model.WidgetPickerDataProvider;
 import com.android.launcher3.widget.util.WidgetSizeHandler;
 import com.android.systemui.plugins.shared.LauncherOverlayManager;
 import com.android.systemui.plugins.shared.LauncherOverlayManager.LauncherOverlayTouchProxy;
+import com.android.wm.shell.shared.bubbles.logging.EntryPoint;
 
 import java.io.FileDescriptor;
 import java.io.PrintWriter;
@@ -264,7 +283,7 @@ import java.util.stream.Stream;
  * Default launcher application.
  */
 public class Launcher extends StatefulActivity<LauncherState>
-        implements InvariantDeviceProfile.OnIDPChangeListener {
+        implements InvariantDeviceProfile.OnIDPChangeListener, BubbleActivityStarter {
     public static final String TAG = "Launcher";
 
     public static final ContextTracker.ActivityTracker<Launcher> ACTIVITY_TRACKER =
@@ -279,6 +298,9 @@ public class Launcher extends StatefulActivity<LauncherState>
      * request codes used internally.
      */
     protected static final int REQUEST_LAST = 100;
+
+    private static final int REQUEST_POST_NOTIFICATIONS = 15;
+    private static final String BUBBLE_CHANNEL_ID = BuildConfig.APPLICATION_ID + ".bubbles";
 
     public static final String INTENT_ACTION_ALL_APPS_TOGGLE =
             "launcher.intent_action_all_apps_toggle";
@@ -2787,21 +2809,107 @@ public class Launcher extends StatefulActivity<LauncherState>
      */
     public Stream<SystemShortcut.Factory> getSupportedShortcuts(ItemInfo itemInfo) {
         int container = itemInfo.container;
+        Stream<SystemShortcut.Factory> shortcuts;
         if (container == CONTAINER_DESKTOP || container == CONTAINER_HOTSEAT) {
-            return Stream.of(APP_INFO, WIDGETS, INSTALL, REMOVE);
+            shortcuts = Stream.of(APP_INFO, WIDGETS, INSTALL, REMOVE);
         } else if (container == CONTAINER_ALL_APPS || container == CONTAINER_ALL_APPS_PREDICTION) {
             // TODO(b/444744861): Update private space apps to have its own container.
             boolean isPinnable = itemInfo instanceof ItemInfoWithIcon info
                     && (info.runtimeStatusFlags & FLAG_NOT_PINNABLE) == 0;
             if (isPinnable) {
-                return Stream.of(APP_INFO, WIDGETS, INSTALL, ADD_TO_HOME_SCREEN);
+                shortcuts = Stream.of(APP_INFO, WIDGETS, INSTALL, ADD_TO_HOME_SCREEN);
             } else {
-                return Stream.of(APP_INFO, WIDGETS, INSTALL);
+                shortcuts = Stream.of(APP_INFO, WIDGETS, INSTALL);
             }
+        } else {
+            // LauncherEX: Storage/Contact Scopes shortcuts depend on GrapheneOS framework APIs
+            // hidden from third-party APKs, so expose only public package actions here.
+            shortcuts = Stream.of(APP_INFO, WIDGETS, INSTALL);
         }
-        // LauncherEX: Storage/Contact Scopes shortcuts depend on GrapheneOS framework APIs hidden
-        // from third-party APKs, so expose only public package actions here.
-        return Stream.of(APP_INFO, WIDGETS, INSTALL);
+
+        // ponytail: current-user apps only; add profile support if cross-user PendingIntents become
+        // available to a side-loaded launcher.
+        return LauncherPrefs.APP_BUBBLES.get(this)
+                        && itemInfo.itemType == ITEM_TYPE_APPLICATION
+                        && Process.myUserHandle().equals(itemInfo.user)
+                ? Stream.concat(shortcuts, Stream.of(BUBBLE_SHORTCUT))
+                : shortcuts;
+    }
+
+    @Override
+    public void showShortcutBubble(ShortcutInfo info, EntryPoint entryPoint) {
+        Log.w(TAG, "Deep-shortcut notification bubbles are not supported");
+    }
+
+    @Override
+    public void showAppBubble(Intent intent, UserHandle user, EntryPoint entryPoint) {
+        if (!Process.myUserHandle().equals(user)) return;
+        if (checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS)
+                != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(
+                    new String[] {Manifest.permission.POST_NOTIFICATIONS},
+                    REQUEST_POST_NOTIFICATIONS);
+            return;
+        }
+
+        Intent target = new Intent(intent);
+        ResolveInfo resolveInfo = getPackageManager().resolveActivity(target, 0);
+        if (resolveInfo == null) {
+            Log.w(TAG, "Unable to resolve bubble target: " + target);
+            return;
+        }
+
+        String packageName = resolveInfo.activityInfo.packageName;
+        CharSequence label = resolveInfo.loadLabel(getPackageManager());
+        String shortcutId = "bubble:" + packageName;
+        int iconSize = getDeviceProfile().getWorkspaceProfile().getIconSizePx();
+        Bitmap iconBitmap = Bitmap.createBitmap(iconSize, iconSize, Bitmap.Config.ARGB_8888);
+        Drawable targetIcon = resolveInfo.loadIcon(getPackageManager());
+        targetIcon.setBounds(0, 0, iconSize, iconSize);
+        targetIcon.draw(new Canvas(iconBitmap));
+        Icon bubbleIcon = Icon.createWithBitmap(iconBitmap);
+        Person person = new Person.Builder().setName(label).setImportant(true).build();
+        ShortcutInfo shortcut = new ShortcutInfo.Builder(this, shortcutId)
+                .setShortLabel(label)
+                .setIcon(bubbleIcon)
+                .setPerson(person)
+                .setLongLived(true)
+                .setActivity(getComponentName())
+                .setIntent(new Intent(Intent.ACTION_VIEW, null, this, Launcher.class))
+                .build();
+        try {
+            getSystemService(ShortcutManager.class).pushDynamicShortcut(shortcut);
+        } catch (RuntimeException e) {
+            Log.e(TAG, "Unable to publish bubble shortcut", e);
+            return;
+        }
+
+        PendingIntent bubbleIntent = PendingIntent.getActivity(
+                this, shortcutId.hashCode(), target, FLAG_UPDATE_CURRENT | FLAG_MUTABLE);
+        NotificationChannel channel = new NotificationChannel(
+                BUBBLE_CHANNEL_ID, getString(R.string.bubble), NotificationManager.IMPORTANCE_HIGH);
+        channel.setAllowBubbles(true);
+        NotificationManager notificationManager = getSystemService(NotificationManager.class);
+        notificationManager.createNotificationChannel(channel);
+        Notification notification = new Notification.Builder(this, BUBBLE_CHANNEL_ID)
+                .setSmallIcon(R.drawable.ic_bubble_button)
+                .setContentTitle(label)
+                .setContentText(label)
+                .setContentIntent(bubbleIntent)
+                .setCategory(Notification.CATEGORY_MESSAGE)
+                .setShortcutId(shortcutId)
+                .addPerson(person)
+                .setStyle(new Notification.MessagingStyle(person)
+                        .addMessage(label, System.currentTimeMillis(), person))
+                .setBubbleMetadata(new Notification.BubbleMetadata.Builder(bubbleIntent, bubbleIcon)
+                        .setDesiredHeight(Integer.MAX_VALUE)
+                        .setAutoExpandBubble(true)
+                        .setSuppressNotification(true)
+                        .build())
+                .setOnlyAlertOnce(true)
+                .build();
+
+        notificationManager.notify(shortcutId, 0, notification);
     }
 
     /**
