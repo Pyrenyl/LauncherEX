@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="1024"
+    android:viewportHeight="1024">
+
+    <group
+        android:pivotX="512"
+        android:pivotY="512"
+        android:scaleX="0.78"
+        android:scaleY="0.78">
+
+        <!-- Five bonds meeting the hexagon with flat ends. -->
+        <path
+            android:pathData="M512,284L512,166 M699.061487,392L801.252477,333 M699.061487,608L801.252477,667 M324.938513,608L222.747523,667 M324.938513,392L222.747523,333"
+            android:strokeColor="@color/launcher_icon_secondary"
+            android:strokeWidth="32" />
+
+        <!-- Six congruent circles on a regular hexagon. -->
+        <path
+            android:fillColor="@color/launcher_icon_secondary"
+            android:pathData="M560,166A48,48 0,1 1,464,166A48,48 0,1 1,560,166 M849.252477,333A48,48 0,1 1,753.252477,333A48,48 0,1 1,849.252477,333 M849.252477,667A48,48 0,1 1,753.252477,667A48,48 0,1 1,849.252477,667 M560,834A48,48 0,1 1,464,834A48,48 0,1 1,560,834 M270.747523,667A48,48 0,1 1,174.747523,667A48,48 0,1 1,270.747523,667 M270.747523,333A48,48 0,1 1,174.747523,333A48,48 0,1 1,270.747523,333" />
+
+        <!-- Point-up regular hexagon. -->
+        <path
+            android:fillColor="@color/launcher_icon_primary"
+            android:pathData="M512,260L719.846097,380L719.846097,620L512,740L304.153903,620L304.153903,380Z" />
+
+        <!-- Mirror-symmetric Home cutout. -->
+        <path
+            android:fillColor="@color/icon_background"
+            android:pathData="M512,480Q515,480 519,484L631,585Q635,589 633,593Q631,596 626,596L616,596L616,760L408,760L408,596L398,596Q393,596 391,593Q389,589 393,585L505,484Q509,480 512,480Z" />
+
+        <!-- Lower bond remains rounded and visible through the Home cutout. -->
+        <path
+            android:pathData="M512,630L512,834"
+            android:strokeColor="@color/launcher_icon_secondary"
+            android:strokeLineCap="round"
+            android:strokeWidth="32" />
+    </group>
+</vector>
