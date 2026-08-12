@@ -133,7 +133,9 @@
         <item>@dimen/swipe_up_max_velocity</item>
     </array>
 
-    <string-array name="filtered_components" ></string-array>
+    <string-array name="filtered_components">
+        <item>com.android.launcher3.ex/com.android.launcher3.Launcher</item>
+    </string-array>
     <string-array name="default_featured_widget_apps" translatable="false">
     </string-array>
 
