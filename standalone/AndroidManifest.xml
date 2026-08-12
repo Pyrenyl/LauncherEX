@@ -144,6 +144,10 @@
             </intent-filter>
         </receiver>
 
+        <receiver
+            android:name="com.android.launcher3.BubbleDismissReceiver"
+            android:exported="false" />
+
         <!--
         LauncherEX: the system dialer converts *#*#3825#*#* into this protected broadcast.
         Listen only to the modern action because Android emits both modern and legacy actions.

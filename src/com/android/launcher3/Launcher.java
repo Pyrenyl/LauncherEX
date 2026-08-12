@@ -16,6 +16,7 @@
 
 package com.android.launcher3;
 
+import static android.app.PendingIntent.FLAG_IMMUTABLE;
 import static android.app.PendingIntent.FLAG_MUTABLE;
 import static android.app.PendingIntent.FLAG_UPDATE_CURRENT;
 import static android.content.pm.ActivityInfo.CONFIG_UI_MODE;
@@ -2886,6 +2887,12 @@ public class Launcher extends StatefulActivity<LauncherState>
 
         PendingIntent bubbleIntent = PendingIntent.getActivity(
                 this, shortcutId.hashCode(), target, FLAG_UPDATE_CURRENT | FLAG_MUTABLE);
+        PendingIntent deleteIntent = PendingIntent.getBroadcast(
+                this,
+                shortcutId.hashCode(),
+                new Intent(this, BubbleDismissReceiver.class)
+                        .putExtra(BubbleDismissReceiver.EXTRA_SHORTCUT_ID, shortcutId),
+                FLAG_UPDATE_CURRENT | FLAG_IMMUTABLE);
         NotificationChannel channel = new NotificationChannel(
                 BUBBLE_CHANNEL_ID, getString(R.string.bubble), NotificationManager.IMPORTANCE_HIGH);
         channel.setAllowBubbles(true);
@@ -2902,6 +2909,7 @@ public class Launcher extends StatefulActivity<LauncherState>
                 .setStyle(new Notification.MessagingStyle(person)
                         .addMessage(label, System.currentTimeMillis(), person))
                 .setBubbleMetadata(new Notification.BubbleMetadata.Builder(bubbleIntent, bubbleIcon)
+                        .setDeleteIntent(deleteIntent)
                         .setDesiredHeight(Integer.MAX_VALUE)
                         .setAutoExpandBubble(true)
                         .setSuppressNotification(true)
