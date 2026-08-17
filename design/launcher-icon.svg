@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg"
+    width="1024"
+    height="1024"
+    viewBox="0 0 1024 1024"
+    shape-rendering="geometricPrecision">
+  <!--
+    Shared center: (512, 500)
+    Main regular hexagon circumradius: 240
+    Node-center regular hexagon circumradius: 334
+    sin(60°) = sqrt(3) / 2
+  -->
+  <defs>
+    <mask id="home-cutout" maskUnits="userSpaceOnUse" x="0" y="0" width="1024" height="1024">
+      <rect width="1024" height="1024" fill="#FFFFFF"/>
+      <!-- Mirror-symmetric Home silhouette, extended below the main hexagon. -->
+      <path
+          d="M512 480
+             Q515 480 519 484
+             L631 585
+             Q635 589 633 593
+             Q631 596 626 596
+             L616 596
+             L616 760
+             L408 760
+             L408 596
+             L398 596
+             Q393 596 391 593
+             Q389 589 393 585
+             L505 484
+             Q509 480 512 480
+             Z"
+          fill="#000000"/>
+    </mask>
+  </defs>
+
+  <rect width="1024" height="1024" rx="192" fill="#F8F6F1"/>
+
+  <g fill="#7B8FDC" stroke="#7B8FDC" stroke-width="32">
+    <!-- Five connected radial carbon bonds. -->
+    <g stroke-linecap="butt">
+      <path d="M512 284 L512 166"/>
+      <path d="M699.061487 392 L801.252477 333"/>
+      <path d="M699.061487 608 L801.252477 667"/>
+      <path d="M324.938513 608 L222.747523 667"/>
+      <path d="M324.938513 392 L222.747523 333"/>
+    </g>
+
+    <!-- The lower bond is deliberately detached inside the Home cutout. -->
+    <path d="M512 630 L512 834" stroke-linecap="round"/>
+
+    <!-- Six congruent circles on a regular hexagon of radius 334. -->
+    <circle cx="512" cy="166" r="48" stroke="none"/>
+    <circle cx="801.252477" cy="333" r="48" stroke="none"/>
+    <circle cx="801.252477" cy="667" r="48" stroke="none"/>
+    <circle cx="512" cy="834" r="48" stroke="none"/>
+    <circle cx="222.747523" cy="667" r="48" stroke="none"/>
+    <circle cx="222.747523" cy="333" r="48" stroke="none"/>
+  </g>
+
+  <!-- Point-up regular hexagon: center (512, 500), circumradius 240. -->
+  <polygon
+      points="512,260 719.846097,380 719.846097,620 512,740 304.153903,620 304.153903,380"
+      fill="#2878E5"
+      mask="url(#home-cutout)"/>
+</svg>
