@@ -24,17 +24,27 @@ import static com.android.launcher3.BuildConfig.IS_STUDIO_BUILD;
 import static com.android.launcher3.InvariantDeviceProfile.TYPE_MULTI_DISPLAY;
 import static com.android.launcher3.InvariantDeviceProfile.TYPE_TABLET;
 import static com.android.launcher3.LauncherPrefs.LETTER_FAST_SCROLLER_KEY;
+import static com.android.launcher3.LauncherPrefs.PRIVATE_SPACE_SECRET_CODE;
+import static com.android.launcher3.LauncherPrefs.PRIVATE_SPACE_SECRET_CODE_KEY;
+import static com.android.launcher3.LauncherPrefs.PRIVATE_SPACE_SECRET_CODE_MAX_LENGTH;
 import static com.android.launcher3.util.Executors.MAIN_EXECUTOR;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.text.InputFilter.LengthFilter;
 import android.text.TextUtils;
+import android.text.method.DigitsKeyListener;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
+import android.widget.EditText;
+import android.widget.FrameLayout;
 
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
@@ -56,6 +66,7 @@ import com.android.launcher3.BuildConfig;
 import com.android.launcher3.InvariantDeviceProfile;
 import com.android.launcher3.Launcher;
 import com.android.launcher3.LauncherFiles;
+import com.android.launcher3.LauncherPrefs;
 import com.android.launcher3.R;
 import com.android.launcher3.display.DisplayController;
 import com.android.launcher3.display.LauncherDisplayInfo;
@@ -342,8 +353,57 @@ public class SettingsActivity extends FragmentActivity
                         return true;
                     });
                     return true;
+                case PRIVATE_SPACE_SECRET_CODE_KEY:
+                    updatePrivateSpaceSecretCodeSummary(preference);
+                    preference.setOnPreferenceClickListener(pref -> {
+                        showPrivateSpaceSecretCodeDialog(pref);
+                        return true;
+                    });
+                    return true;
             }
             return true;
+        }
+
+        private void updatePrivateSpaceSecretCodeSummary(Preference preference) {
+            preference.setSummary(getString(R.string.private_space_secret_code_summary,
+                    PRIVATE_SPACE_SECRET_CODE.get(getContext())));
+        }
+
+        private void showPrivateSpaceSecretCodeDialog(Preference preference) {
+            EditText input = new EditText(getContext());
+            input.setSingleLine();
+            input.setKeyListener(DigitsKeyListener.getInstance("0123456789"));
+            input.setFilters(new LengthFilter[]{
+                    new LengthFilter(PRIVATE_SPACE_SECRET_CODE_MAX_LENGTH)});
+            input.setText(PRIVATE_SPACE_SECRET_CODE.get(getContext()));
+            input.selectAll();
+
+            int padding = getResources().getDimensionPixelSize(R.dimen.dialog_padding);
+            FrameLayout container = new FrameLayout(getContext());
+            container.setPadding(padding, 0, padding, 0);
+            container.addView(input);
+            AlertDialog dialog = new AlertDialog.Builder(getContext())
+                    .setTitle(R.string.private_space_secret_code_title)
+                    .setView(container)
+                    .setNegativeButton(android.R.string.cancel, null)
+                    .setPositiveButton(android.R.string.ok, null)
+                    .create();
+            dialog.setOnShowListener(unused -> {
+                dialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(v -> {
+                    String code = input.getText().toString();
+                    if (TextUtils.isEmpty(code)) {
+                        input.setError(getString(R.string.private_space_secret_code_empty_error));
+                        return;
+                    }
+                    LauncherPrefs.get(getContext()).put(PRIVATE_SPACE_SECRET_CODE, code);
+                    updatePrivateSpaceSecretCodeSummary(preference);
+                    dialog.dismiss();
+                });
+                input.requestFocus();
+                dialog.getWindow().setSoftInputMode(
+                        WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+            });
+            dialog.show();
         }
 
         @Override

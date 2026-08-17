@@ -51,4 +51,10 @@
         android:defaultValue="true"
         android:persistent="true" />
 
+    <Preference
+        android:key="pref_private_space_secret_code"
+        android:title="@string/private_space_secret_code_title"
+        android:persistent="false"
+        launcher:iconSpaceReserved="false" />
+
 </androidx.preference.PreferenceScreen>

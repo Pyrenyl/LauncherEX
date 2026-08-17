@@ -277,6 +277,9 @@
     <string name="letter_fast_scroller_description">在应用抽屉中显示字母索引</string>
     <string name="app_bubbles_title">以气泡打开应用</string>
     <string name="app_bubbles_description">在应用图标的长按菜单中显示此选项</string>
+    <string name="private_space_secret_code_title">隐私空间拨号代码</string>
+    <string name="private_space_secret_code_summary">拨号输入 *#*#%1$s#*#*</string>
+    <string name="private_space_secret_code_empty_error">请至少输入一位数字</string>
     <string name="organizer_create_screen_title" msgid="1052454457895703433">"创建屏幕"</string>
     <string name="organizer_create_screen_description" msgid="3224132391919219061">"选择一个类别，以便从手机添加应用和微件"</string>
     <string name="organizer_choose_layout_title" msgid="127228966942084947">"选择布局"</string>

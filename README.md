@@ -12,7 +12,7 @@ Standalone, non-Quickstep Launcher3 fork for Android 17 / API 37.
 - Launcher3 home screen, app drawer, folders, search, and widgets.
 - Search Chinese app names by pinyin initials.
 - Private Space support, including hiding its entry point while locked.
-- Toggle Private Space from the dialer with `*#*#3825#*#*`.
+- Toggle Private Space from the dialer.
 - Lock Private Space from the lock-screen camera shortcut or the locked-state double-press power
   gesture by selecting LauncherEX as the secure-camera handler.
 - Honor apps that hide their launcher entry instead of showing Android's synthetic app-info

@@ -256,6 +256,8 @@ constructor(@ApplicationContext private val encryptedContext: Context) {
         const val ENABLE_TWO_LINE_TOGGLE_KEY: String = "pref_enable_two_line_toggle"
         const val LETTER_FAST_SCROLLER_KEY: String = "pref_letter_fast_scroller"
         const val APP_BUBBLES_KEY: String = "pref_app_bubbles"
+        const val PRIVATE_SPACE_SECRET_CODE_KEY: String = "pref_private_space_secret_code"
+        const val PRIVATE_SPACE_SECRET_CODE_MAX_LENGTH: Int = 12
 
         @JvmField
         val ENABLE_TWOLINE_ALLAPPS_TOGGLE =
@@ -265,6 +267,8 @@ constructor(@ApplicationContext private val encryptedContext: Context) {
 
         @JvmField val LETTER_FAST_SCROLLER = backedUpItem(LETTER_FAST_SCROLLER_KEY, false)
         @JvmField val APP_BUBBLES = backedUpItem(APP_BUBBLES_KEY, true)
+        @JvmField val PRIVATE_SPACE_SECRET_CODE =
+            backedUpItem(PRIVATE_SPACE_SECRET_CODE_KEY, "3825")
 
         @JvmField
         val PROMISE_ICON_IDS = nonRestorableItem(InstallSessionHelper.PROMISE_ICON_IDS, "")

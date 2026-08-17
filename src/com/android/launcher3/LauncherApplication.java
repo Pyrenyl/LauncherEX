@@ -33,6 +33,7 @@ public class LauncherApplication extends Application {
     public void onCreate() {
         super.onCreate();
         LauncherComponentProvider.get(this).getMainProcessInitializer().init(this);
+        new PrivateSpaceSecretCodeReceiver(this).start();
     }
 
     public LauncherAppComponent getAppComponent() {

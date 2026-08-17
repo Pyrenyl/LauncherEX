@@ -149,22 +149,6 @@
             android:exported="false" />
 
         <!--
-        LauncherEX: the system dialer converts *#*#3825#*#* into this protected broadcast.
-        Listen only to the modern action because Android emits both modern and legacy actions.
-        -->
-        <receiver
-            android:name="com.android.launcher3.PrivateSpaceSecretCodeReceiver"
-            android:exported="true" >
-            <intent-filter>
-                <action android:name="android.telephony.action.SECRET_CODE" />
-
-                <data
-                    android:host="3825"
-                    android:scheme="android_secret_code" />
-            </intent-filter>
-        </receiver>
-
-        <!--
         LauncherEX: handle only the secure-camera action used while the device is locked.
         The no-display activity locks Private Space immediately without replacing normal camera flows.
         -->
