@@ -5,6 +5,11 @@ plugins {
     id("org.jetbrains.kotlin.plugin.compose") version "2.2.10"
 }
 
+val cfgReleaseStoreFile = providers.environmentVariable("RELEASE_STORE_FILE").orNull
+val cfgReleaseStorePassword = providers.environmentVariable("RELEASE_STORE_PASSWORD").orNull
+val cfgReleaseKeyAlias = providers.environmentVariable("RELEASE_KEY_ALIAS").orNull
+val cfgReleaseKeyPassword = providers.environmentVariable("RELEASE_KEY_PASSWORD").orNull
+
 android {
     namespace = "com.android.launcher3"
     compileSdk = 37
@@ -63,6 +68,15 @@ android {
         compose = true
     }
 
+    signingConfigs {
+        create("release") {
+            storeFile = cfgReleaseStoreFile?.let { file(it) }
+            storePassword = cfgReleaseStorePassword
+            keyAlias = cfgReleaseKeyAlias
+            keyPassword = cfgReleaseKeyPassword
+        }
+    }
+
     buildTypes {
         debug {
             applicationIdSuffix = ".debug"
@@ -70,7 +84,7 @@ android {
         release {
             isMinifyEnabled = true
             isShrinkResources = true
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig = signingConfigs.getByName("release")
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard.flags",
