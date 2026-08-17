@@ -252,6 +252,7 @@
     <string name="ps_container_title" msgid="4391796149519594205">"私密"</string>
     <string name="ps_container_settings" msgid="6059734123353320479">"私密空间设置"</string>
     <string name="ps_container_unlock_button_content_description" msgid="9181551784092204234">"私密，未锁定。"</string>
+    <string name="private_space_unlocked_toast">隐私空间已解锁</string>
     <string name="ps_container_lock_button_content_description" msgid="5961993384382649530">"私密，已锁定。"</string>
     <string name="ps_container_lock_title" msgid="2640257399982364682">"锁定"</string>
     <string name="ps_container_transition" msgid="8667331812048014412">"私密空间转换"</string>

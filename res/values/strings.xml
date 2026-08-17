@@ -635,6 +635,7 @@
     <string name="ps_container_settings">Private Space Settings</string>
     <!-- Description for Private Space Unlock button -->
     <string name="ps_container_unlock_button_content_description">Private, unlocked.</string>
+    <string name="private_space_unlocked_toast">Private space unlocked</string>
     <!-- Description for Private Space Lock button -->
     <string name="ps_container_lock_button_content_description">Private, locked.</string>
     <string name="ps_container_lock_title">Lock</string>

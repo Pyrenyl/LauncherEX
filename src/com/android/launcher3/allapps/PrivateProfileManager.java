@@ -52,6 +52,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -326,6 +327,8 @@ public class PrivateProfileManager extends UserProfileManager {
      * {@link AlphabeticalAppsList#onAppsUpdated()}
      */
     void postUnlock() {
+        Toast.makeText(mAllApps.getContext(), R.string.private_space_unlocked_toast,
+                Toast.LENGTH_SHORT).show();
         if (mAllApps.isSearching()) {
             mUiExecutor.post(this::exitSearchAndExpand);
         } else {
